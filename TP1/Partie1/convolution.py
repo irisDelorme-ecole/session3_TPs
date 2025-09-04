@@ -3,9 +3,20 @@ import matplotlib.pyplot as plt
 from scipy import signal
 
 def convolution(original,noyau):
-    pass
+    shapeOG = original.shape
+    conv = original.copy()
+    original = np.pad(original, 1, mode='constant')
+    print(original)
+    for i in range(shapeOG[0]-1):
+        for j in range(shapeOG[1]-1):
+            mult = original[i:i+3,j:j+3]*noyau
+            conv[i,j] = np.sum(mult)
+
+
+    return conv
 
 def afficher(img0,img1, img2):
+    #
     fig, axes = plt.subplots(ncols=3)
     axes[0].imshow(img0, cmap=plt.get_cmap('gray'))
     axes[0].set_title("Image Originale")
@@ -39,4 +50,5 @@ sortie2 = signal.convolve2d(image_dessin,noyau, mode='same', boundary='fill', fi
 
 #Afficher les trois images
 afficher(image_dessin,sortie,sortie2)
+#
 
