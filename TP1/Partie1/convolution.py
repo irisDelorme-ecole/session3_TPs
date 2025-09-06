@@ -13,7 +13,7 @@ def convolution(original,noyau):
             conv[i,j] = np.sum(mult)
 
 
-    return conv
+    return conv #ma convolution garde ses bords noirs, car moi je pad avec du noir, mais numpy semble pader avec du blanc.
 
 def afficher(img0,img1, img2):
     #
