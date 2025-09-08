@@ -2,7 +2,7 @@ import sympy as sp
 from sympy import Eq, init_printing
 import matplotlib.pyplot as plt
 import numpy as np
-from sympy.plotting.textplot import linspace
+
 
 #1
 init_printing()
@@ -34,7 +34,7 @@ sp.pprint(equ.subs(x,solved_deriv[1]))
 
 #e)
 print('integrale indefinie de f(x)')
-sp.pprint(sp.integrate(equ, x))
+sp.pprint(sp.integrate(deriv, x))
 
 #f)
 print('integrale de f(x) entre 0 et 2')
