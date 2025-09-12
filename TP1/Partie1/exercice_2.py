@@ -58,10 +58,26 @@ plt.plot(x,f_num(x), label="f(x)")
 plt.plot(x,fprime_num(x), label="f'(x)")
 
 
-#reste 2 et 3
+
 
 plt.plot( solved_deriv[1],0, marker=".", color="black",  markersize=4, label="derivative of f(x) == 0")
 plt.plot(solved_deriv[0],0, marker=".", color="black",  markersize=4, label="derivative of f(x) == 0")
 plt.plot(x, tanplot_num, label="tangente de f(x) a x = -1")
 plt.legend()
 plt.show()
+
+#2
+
+x, y, z = sp.symbols('x y z')
+equ1 = Eq(2*x + 3*y +z, 2)
+equ2 = Eq(-x + 2*y + 3*z, -1)
+equ3 = Eq(-3*x + 3*y +z, 0)
+
+
+print(sp.solve((equ1,equ2,equ3), (x, y, z)))
+
+#3
+x = sp.symbols('x')
+g = 6*x**5 - 9*x**4 - 49*x**3 + 87*x**2 - 17*x + 30
+sp.pprint(sp.factor(g))
+sp.pprint(sp.expand(sp.factor(g)))
