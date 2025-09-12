@@ -1,4 +1,5 @@
 from skimage import data
+from PIL import Image
 
 import skimage as sk
 import numpy as np
@@ -54,10 +55,10 @@ def affichage_final(im_base, im_blur, im_gradx, im_grady, im_ampl_grad, im_conto
 
 
 def ask_image():#demande quelle image est souhaitee, puis appelle un "constructeur"(pas vraiment, mais meme fonction)
-    if input("image 1 (homme avec camera) ou 2 (brick, aussi le default)") == '1':
+    if input("image 1 (homme avec camera) ou 2 (hello kitty, aussi le default)") == '1':
          construire(data.camera())
     else:
-        construire(data.brick())
+        construire(Image.open('hello_kitty.jpg').convert('L'))
 
 ask_image()
 
