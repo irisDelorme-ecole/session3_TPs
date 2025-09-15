@@ -1,0 +1,477 @@
+{
+  "elements"
+  : [
+  {
+    "numero_atomique": 1,
+    "nom": "Hydrogène"
+  },
+  {
+    "numero_atomique": 2,
+    "nom": "Hélium"
+  },
+  {
+    "numero_atomique": 3,
+    "nom": "Lithium"
+  },
+  {
+    "numero_atomique": 4,
+    "nom": "Béryllium"
+  },
+  {
+    "numero_atomique": 5,
+    "nom": "Bore"
+  },
+  {
+    "numero_atomique": 6,
+    "nom": "Carbone"
+  },
+  {
+    "numero_atomique": 7,
+    "nom": "Azote"
+  },
+  {
+    "numero_atomique": 8,
+    "nom": "Oxygène"
+  },
+  {
+    "numero_atomique": 9,
+    "nom": "Fluor"
+  },
+  {
+    "numero_atomique": 10,
+    "nom": "Néon"
+  },
+  {
+    "numero_atomique": 11,
+    "nom": "Sodium"
+  },
+  {
+    "numero_atomique": 12,
+    "nom": "Magnésium"
+  },
+  {
+    "numero_atomique": 13,
+    "nom": "Aluminium"
+  },
+  {
+    "numero_atomique": 14,
+    "nom": "Silicium"
+  },
+  {
+    "numero_atomique": 15,
+    "nom": "Phosphore"
+  },
+  {
+    "numero_atomique": 16,
+    "nom": "Soufre"
+  },
+  {
+    "numero_atomique": 17,
+    "nom": "Chlore"
+  },
+  {
+    "numero_atomique": 18,
+    "nom": "Argon"
+  },
+  {
+    "numero_atomique": 19,
+    "nom": "Potassium"
+  },
+  {
+    "numero_atomique": 20,
+    "nom": "Calcium"
+  },
+  {
+    "numero_atomique": 21,
+    "nom": "Scandium"
+  },
+  {
+    "numero_atomique": 22,
+    "nom": "Titane"
+  },
+  {
+    "numero_atomique": 23,
+    "nom": "Vanadium"
+  },
+  {
+    "numero_atomique": 24,
+    "nom": "Chrome"
+  },
+  {
+    "numero_atomique": 25,
+    "nom": "Manganèse"
+  },
+  {
+    "numero_atomique": 26,
+    "nom": "Fer"
+  },
+  {
+    "numero_atomique": 27,
+    "nom": "Cobalt"
+  },
+  {
+    "numero_atomique": 28,
+    "nom": "Nickel"
+  },
+  {
+    "numero_atomique": 29,
+    "nom": "Cuivre"
+  },
+  {
+    "numero_atomique": 30,
+    "nom": "Zinc"
+  },
+  {
+    "numero_atomique": 31,
+    "nom": "Gallium"
+  },
+  {
+    "numero_atomique": 32,
+    "nom": "Germanium"
+  },
+  {
+    "numero_atomique": 33,
+    "nom": "Arsenic"
+  },
+  {
+    "numero_atomique": 34,
+    "nom": "Sélénium"
+  },
+  {
+    "numero_atomique": 35,
+    "nom": "Brome"
+  },
+  {
+    "numero_atomique": 36,
+    "nom": "Krypton"
+  },
+  {
+    "numero_atomique": 37,
+    "nom": "Rubidium"
+  },
+  {
+    "numero_atomique": 38,
+    "nom": "Strontium"
+  },
+  {
+    "numero_atomique": 39,
+    "nom": "Yttrium"
+  },
+  {
+    "numero_atomique": 40,
+    "nom": "Zirconium"
+  },
+  {
+    "numero_atomique": 41,
+    "nom": "Niobium"
+  },
+  {
+    "numero_atomique": 42,
+    "nom": "Molybdène"
+  },
+  {
+    "numero_atomique": 43,
+    "nom": "Technétium"
+  },
+  {
+    "numero_atomique": 44,
+    "nom": "Ruthénium"
+  },
+  {
+    "numero_atomique": 45,
+    "nom": "Rhodié"
+  },
+  {
+    "numero_atomique": 46,
+    "nom": "Palladium"
+  },
+  {
+    "numero_atomique": 47,
+    "nom": "Argent"
+  },
+  {
+    "numero_atomique": 48,
+    "nom": "Cadmium"
+  },
+  {
+    "numero_atomique": 49,
+    "nom": "Indium"
+  },
+  {
+    "numero_atomique": 50,
+    "nom": "Étain"
+  },
+  {
+    "numero_atomique": 51,
+    "nom": "Antimoine"
+  },
+  {
+    "numero_atomique": 52,
+    "nom": "Tellure"
+  },
+  {
+    "numero_atomique": 53,
+    "nom": "Iode"
+  },
+  {
+    "numero_atomique": 54,
+    "nom": "Xénon"
+  },
+  {
+    "numero_atomique": 55,
+    "nom": "Césium"
+  },
+  {
+    "numero_atomique": 56,
+    "nom": "Baryum"
+  },
+  {
+    "numero_atomique": 57,
+    "nom": "Lanthane"
+  },
+  {
+    "numero_atomique": 58,
+    "nom": "Cérium"
+  },
+  {
+    "numero_atomique": 59,
+    "nom": "Praséodyme"
+  },
+  {
+    "numero_atomique": 60,
+    "nom": "Néodyme"
+  },
+  {
+    "numero_atomique": 61,
+    "nom": "Prométhium"
+  },
+  {
+    "numero_atomique": 62,
+    "nom": "Samarium"
+  },
+  {
+    "numero_atomique": 63,
+    "nom": "Europium"
+  },
+  {
+    "numero_atomique": 64,
+    "nom": "Gadolinium"
+  },
+  {
+    "numero_atomique": 65,
+    "nom": "Terbium"
+  },
+  {
+    "numero_atomique": 66,
+    "nom": "Dysprosium"
+  },
+  {
+    "numero_atomique": 67,
+    "nom": "Holmium"
+  },
+  {
+    "numero_atomique": 68,
+    "nom": "Erbium"
+  },
+  {
+    "numero_atomique": 69,
+    "nom": "Thulium"
+  },
+  {
+    "numero_atomique": 70,
+    "nom": "Ytterbium"
+  },
+  {
+    "numero_atomique": 71,
+    "nom": "Lutécium"
+  },
+  {
+    "numero_atomique": 72,
+    "nom": "Hafnium"
+  },
+  {
+    "numero_atomique": 73,
+    "nom": "Tantale"
+  },
+  {
+    "numero_atomique": 74,
+    "nom": "Tungstène"
+  },
+  {
+    "numero_atomique": 75,
+    "nom": "Rhénium"
+  },
+  {
+    "numero_atomique": 76,
+    "nom": "Osmium"
+  },
+  {
+    "numero_atomique": 77,
+    "nom": "Iridium"
+  },
+  {
+    "numero_atomique": 78,
+    "nom": "Platine"
+  },
+  {
+    "numero_atomique": 79,
+    "nom": "Or"
+  },
+  {
+    "numero_atomique": 80,
+    "nom": "Mercure"
+  },
+  {
+    "numero_atomique": 81,
+    "nom": "Thallium"
+  },
+  {
+    "numero_atomique": 82,
+    "nom": "Plomb"
+  },
+  {
+    "numero_atomique": 83,
+    "nom": "Bismuth"
+  },
+  {
+    "numero_atomique": 84,
+    "nom": "Polonium"
+  },
+  {
+    "numero_atomique": 85,
+    "nom": "Astate"
+  },
+  {
+    "numero_atomique": 86,
+    "nom": "Radon"
+  },
+  {
+    "numero_atomique": 87,
+    "nom": "Francium"
+  },
+  {
+    "numero_atomique": 88,
+    "nom": "Radium"
+  },
+  {
+    "numero_atomique": 89,
+    "nom": "Actinium"
+  },
+  {
+    "numero_atomique": 90,
+    "nom": "Thorium"
+  },
+  {
+    "numero_atomique": 91,
+    "nom": "Protactinium"
+  },
+  {
+    "numero_atomique": 92,
+    "nom": "Uranium"
+  },
+  {
+    "numero_atomique": 93,
+    "nom": "Neptunium"
+  },
+  {
+    "numero_atomique": 94,
+    "nom": "Plutonium"
+  },
+  {
+    "numero_atomique": 95,
+    "nom": "Américium"
+  },
+  {
+    "numero_atomique": 96,
+    "nom": "Curium"
+  },
+  {
+    "numero_atomique": 97,
+    "nom": "Berkélium"
+  },
+  {
+    "numero_atomique": 98,
+    "nom": "Californium"
+  },
+  {
+    "numero_atomique": 99,
+    "nom": "Einsteinium"
+  },
+  {
+    "numero_atomique": 100,
+    "nom": "Fermium"
+  },
+  {
+    "numero_atomique": 101,
+    "nom": "Mendélévium"
+  },
+  {
+    "numero_atomique": 102,
+    "nom": "Nobelium"
+  },
+  {
+    "numero_atomique": 103,
+    "nom": "Lawrencium"
+  },
+  {
+    "numero_atomique": 104,
+    "nom": "Rutherfordium"
+  },
+  {
+    "numero_atomique": 105,
+    "nom": "Dubnium"
+  },
+  {
+    "numero_atomique": 106,
+    "nom": "Seaborgium"
+  },
+  {
+    "numero_atomique": 107,
+    "nom": "Bohrium"
+  },
+  {
+    "numero_atomique": 108,
+    "nom": "Hassium"
+  },
+  {
+    "numero_atomique": 109,
+    "nom": "Meitnérium"
+  },
+  {
+    "numero_atomique": 110,
+    "nom": "Darmstadtium"
+  },
+  {
+    "numero_atomique": 111,
+    "nom": "Roentgenium"
+  },
+  {
+    "numero_atomique": 112,
+    "nom": "Copernicium"
+  },
+  {
+    "numero_atomique": 113,
+    "nom": "Nihonium"
+  },
+  {
+    "numero_atomique": 114,
+    "nom": "Flérovium"
+  },
+  {
+    "numero_atomique": 115,
+    "nom": "Moscovium"
+  },
+  {
+    "numero_atomique": 116,
+    "nom": "Livermorium"
+  },
+  {
+    "numero_atomique": 117,
+    "nom": "Tennesse"
+  },
+  {
+    "numero_atomique": 118,
+    "nom": "Oganesson"
+  }
+]
+}

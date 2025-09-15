@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle
 from pprint import pprint
+import json
 
 class Electron():
     #attributs
@@ -146,8 +147,23 @@ class Atome():
                 e +=1
         plt.show()
 
+    @classmethod
+    def from_dict(cls, data):
+        atome = cls(data['numero_atomique'], data['nom'])
+        return atome
+
+    def to_dict(self):
+        return {
+            'numero_atomique': self.numero_atomique,
+            'nom': self.nom,
+        }
+
     def __str__(self):
         return f'{self.__nom} ({self.numero_atomique}) '
+
+    def __repr__(self):
+        return f'{self.__nom} ({self.numero_atomique}) '
+
 
 
 helium = Atome(118, "Og")
@@ -155,6 +171,19 @@ print(helium)
 helium.afficher_orbites()
 helium.dessiner_orbites()
 
+class TableauPeriodique():
+    #attribut
+    __elements:list[Atome]
+
+    def __init__(self, elements:list[Atome]):
+        self.__elements = elements
+
+        with open('tableau_periodique.json', 'r', encoding='utf-8') as file:
+            data = json.load(file)
+            for a in data['elements']:
+                self.__elements.append(Atome.from_dict(a))
+        print(self.__elements)
 
 
 
+t = TableauPeriodique([])
