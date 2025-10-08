@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
-import sympy as sp
+
 from fonction_model import FonctionModel
 
 
