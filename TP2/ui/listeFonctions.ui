@@ -10,13 +10,16 @@
     <height>589</height>
    </rect>
   </property>
+  <property name="allowedAreas">
+   <set>Qt::BottomDockWidgetArea|Qt::RightDockWidgetArea|Qt::TopDockWidgetArea</set>
+  </property>
   <property name="windowTitle">
    <string>Liste fonctions</string>
   </property>
   <widget class="QWidget" name="dockWidgetContents">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QListWidget" name="listefonctionsWidget"/>
+     <widget class="QListView" name="fonctionsListView"/>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2">

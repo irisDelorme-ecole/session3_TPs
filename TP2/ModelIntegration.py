@@ -4,18 +4,20 @@ import sympy as sp
 class IntegrationModel():
     __fonction:sp.Basic = "x"
     __borne_inf:int = 0
-    __borne_sup:int = 0
-    __nb_boites:int = 0
+    __borne_sup:int = 5
+    __nb_boites:int = 1
     __is_gauche:bool = True
 
 
-    def __init__(self):
+    def __init__(self, fonction="x"):
         x = sp.symbols('x')
+        self.fonction = fonction
 
 
 
     def integrate(self):
-        return sp.integrate(self.__fonction)
+        x = sp.symbols('x')
+        return sp.integrate(self.__fonction, (x, self.borne_inf, self.borne_sup))
 
 
     def sum(self):
@@ -25,8 +27,10 @@ class IntegrationModel():
         a = (self.borne_sup-self.borne_inf)/self.nb_boites
 
         #make new function with dx to eval.
-        f = sp.symbols('f', cls=sp.Function)
-        f = self.__fonction*a
+        # f = sp.symbols('f', cls=sp.Function)
+        #f = self.fonction*float(a)
+
+        f = sp.sympify(self.fonction)*a
         # make sum
         if self.__is_gauche:
             n = self.nb_boites - 1
@@ -80,4 +84,8 @@ class IntegrationModel():
         # TODO: set validator?
         self.__nb_boites = value
 
-
+    def __str__(self):
+        return str(self.fonction)
+# test = IntegrationModel()
+# test.fonction = "x**3"
+# print(test.sum())
