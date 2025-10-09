@@ -20,8 +20,10 @@ class IntegrationModel():
 
     def sum(self):
         x, i, n, a = sp.symbols('x i n a')
+
         #set width
         a = (self.borne_sup-self.borne_inf)/self.nb_boites
+
         #make new function with dx to eval.
         f = sp.symbols('f', cls=sp.Function)
         f = self.__fonction*a

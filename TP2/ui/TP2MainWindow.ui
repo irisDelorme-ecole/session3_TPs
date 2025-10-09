@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>771</width>
-    <height>492</height>
+    <height>701</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -70,7 +70,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit"/>
+       <widget class="QLineEdit" name="borneInfLineEdit"/>
       </item>
       <item>
        <widget class="QLabel" name="label_3">
@@ -80,7 +80,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit_2"/>
+       <widget class="QLineEdit" name="borneSupLineEdit"/>
       </item>
      </layout>
     </item>
@@ -111,7 +111,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QSlider" name="horizontalSlider">
+            <widget class="QSlider" name="nombreSlider">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -130,14 +130,14 @@
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="radioButton">
+            <widget class="QRadioButton" name="gaucheSumRadioButton">
              <property name="text">
               <string>Somme à gauche</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="radioButton_2">
+            <widget class="QRadioButton" name="droiteSumRadioButton">
              <property name="text">
               <string>Somme à droite</string>
              </property>
@@ -159,7 +159,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButton">
+          <widget class="QPushButton" name="calculerPushButton">
            <property name="text">
             <string>Calculer</string>
            </property>
@@ -177,7 +177,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_3">
+          <widget class="QLineEdit" name="sumLineEdit">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -191,7 +191,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_4">
+          <widget class="QLineEdit" name="integraleLineEdit">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -217,30 +217,30 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionExporter"/>
-    <addaction name="actionQuitter"/>
+    <addaction name="exporterAction"/>
+    <addaction name="quitterAction"/>
    </widget>
    <widget class="QMenu" name="menuFonctions">
     <property name="title">
      <string>Fonctions</string>
     </property>
-    <addaction name="actionListe_fonctions"/>
+    <addaction name="listFonctionsAction"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuFonctions"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionExporter">
+  <action name="exporterAction">
    <property name="text">
     <string>Exporter</string>
    </property>
   </action>
-  <action name="actionQuitter">
+  <action name="quitterAction">
    <property name="text">
     <string>Quitter</string>
    </property>
   </action>
-  <action name="actionListe_fonctions">
+  <action name="listFonctionsAction">
    <property name="text">
     <string>Liste fonctions</string>
    </property>
