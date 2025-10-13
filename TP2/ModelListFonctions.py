@@ -23,3 +23,6 @@ class ModelListFonctions(QAbstractListModel):
 
     def rowCount(self, parent=QModelIndex()):
         return len(self.__fonctions)
+
+    def addItem(self, item):
+        self.__fonctions.append(item)

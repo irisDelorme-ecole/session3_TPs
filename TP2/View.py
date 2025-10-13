@@ -1,10 +1,7 @@
-from PyQt6 import QtWidgets
-from PyQt6.QtGui import QColor, QAction
-from PyQt6.QtWidgets import QMainWindow, QLineEdit, QCheckBox, QPushButton, QVBoxLayout, QWidget, \
-    QColorDialog, QMenu, QRadioButton, QComboBox, QSlider, QFileDialog, QDockWidget, QListView
+from PyQt6.QtWidgets import QMainWindow, QLineEdit, QPushButton, QVBoxLayout, QWidget, QRadioButton, QComboBox, QSlider, QFileDialog, QDockWidget, QListView
 from PyQt6.uic import loadUi
 from PyQt6.QtGui import QIntValidator
-import sympy as sp
+
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from ModelIntegration import IntegrationModel
 from MPLCanvas import MPLCanvas
@@ -44,19 +41,13 @@ class View(QMainWindow):
 
         self.listeModel = ModelListFonctions()
 
-
-        #self.fileDialog = QFileDialog()
-
-        #temp combobox
-        # self.fonctionComboBox.addItem("x")
-        # self.fonctionComboBox.addItem("x**2")
-        # self.fonctionComboBox.addItem("x**2+5")
-
         self.fonctionComboBox.setModel(self.listeModel)
 
         self.fonctionComboBox.currentTextChanged.connect(self.set_fonction)
 
+        self.viewListFonctions = ViewListFonction(self.listeModel, self)
 
+        self.viewListFonctions.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetMovable | QDockWidget.DockWidgetFeature.DockWidgetFloatable)
         #fonctionnement
         self.validatorInf = QIntValidator(self)
 
@@ -88,7 +79,7 @@ class View(QMainWindow):
         self.exporterAction.triggered.connect(self.exporter)
 
     def getList(self):
-        self.viewListFonctions = ViewListFonction(self.listeModel, self)
+
         self.viewListFonctions.show()
 
     def exporter(self):
