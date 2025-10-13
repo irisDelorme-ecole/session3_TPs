@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QMainWindow, QLineEdit, QPushButton, QVBoxLayout, QWidget, QRadioButton, QComboBox, QSlider, QFileDialog, QDockWidget, QListView
 from PyQt6.uic import loadUi
-from PyQt6.QtGui import QIntValidator
+from PyQt6.QtGui import QIntValidator, QAction
 
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from ModelIntegration import IntegrationModel
@@ -22,6 +22,7 @@ class View(QMainWindow):
     fonctionComboBox:QComboBox
     nombreSlider:QSlider
     sumLineEdti: QLineEdit
+    listeFonctionAction:QAction
 
 
     fonction:IntegrationModel
@@ -45,13 +46,13 @@ class View(QMainWindow):
 
         self.fonctionComboBox.currentTextChanged.connect(self.set_fonction)
 
-        self.viewListFonctions = ViewListFonction(self.listeModel, self)
 
-        self.viewListFonctions.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetMovable | QDockWidget.DockWidgetFeature.DockWidgetFloatable)
+        #self.viewListFonctions.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetMovable | QDockWidget.DockWidgetFeature.DockWidgetFloatable)
         #fonctionnement
         self.validatorInf = QIntValidator(self)
 
         self.borneInfLineEdit.setValidator(self.validatorInf)
+
 
         self.validatorSup = QIntValidator(self)
 
@@ -59,7 +60,7 @@ class View(QMainWindow):
 
 
         self.borneSupLineEdit.textChanged.connect(self.validate_sup)
-        self.borneInfLineEdit.textEdited.connect(self.validate_inf)
+        self.borneInfLineEdit.textChanged.connect(self.validate_inf)
 
         self.listFonctionsAction.triggered.connect(self.getList)
 
@@ -79,7 +80,7 @@ class View(QMainWindow):
         self.exporterAction.triggered.connect(self.exporter)
 
     def getList(self):
-
+        self.viewListFonctions = ViewListFonction(self.listeModel, self)
         self.viewListFonctions.show()
 
     def exporter(self):
@@ -107,19 +108,20 @@ class View(QMainWindow):
         state, _, _ = self.validatorInf.validate(texte, 0)
 
         if state == QIntValidator.State.Acceptable:
-            self.borneInfLineEdit.setStyleSheet("background-color: white;")
-            self.fonction.borne_inf = int(self.borneInfLineEdit.text())
+            self.borneInfLineEdit.setStyleSheet("color: black; background-color: white;")
+            self.fonction.borne_inf = int(texte)
+
         else:
-            self.borneInfLineEdit.setStyleSheet("background-color: lightcoral;")
+            self.borneInfLineEdit.setStyleSheet("color: black; background-color: lightcoral;")
 
     def validate_sup(self, texte):
         state, _, _ = self.validatorSup.validate(texte, 0)
 
-        if state == QIntValidator.State.Acceptable:
-            self.borneSupLineEdit.setStyleSheet("background-color: white;")
+        if state == QIntValidator.State.Acceptable and int(texte) > int(self.fonction.borne_inf):
+            self.borneSupLineEdit.setStyleSheet("color: black; background-color: white;")
             self.fonction.borne_sup = int(self.borneSupLineEdit.text())
         else:
-            self.borneSupLineEdit.setStyleSheet("background-color: lightcoral;")
+            self.borneSupLineEdit.setStyleSheet("color: black; background-color: lightcoral;")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

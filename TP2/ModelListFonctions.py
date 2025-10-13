@@ -1,7 +1,9 @@
-from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex
+from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, pyqtSignal
 from ModelIntegration import IntegrationModel
 
 class ModelListFonctions(QAbstractListModel):
+
+    updatedSignal = pyqtSignal(bool)
 
     def __init__(self):
 
@@ -25,4 +27,6 @@ class ModelListFonctions(QAbstractListModel):
         return len(self.__fonctions)
 
     def addItem(self, item):
+        self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
         self.__fonctions.append(item)
+        (self.endInsertRows())
