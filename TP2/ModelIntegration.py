@@ -1,4 +1,5 @@
 import sympy as sp
+from sympy import latex
 
 
 class IntegrationModel():
@@ -85,7 +86,9 @@ class IntegrationModel():
         self.__nb_boites = value
 
     def __str__(self):
+
         return str(self.fonction)
+
 # test = IntegrationModel()
 # test.fonction = "x**3"
 # print(test.sum())

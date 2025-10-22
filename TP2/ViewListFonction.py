@@ -1,6 +1,9 @@
-from PyQt6 import QtWidgets
-from PyQt6.QtGui import QColor, QAction
-from PyQt6.QtWidgets import QDockWidget, QListView, QLineEdit, QPushButton
+from PyQt6 import QtWidgets, QtGui
+from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtGui import QColor, QAction, QTextDocument, QPainter, QPixmap
+import matplotlib.pyplot as plt
+import io
+from PyQt6.QtWidgets import QDockWidget, QListView, QLineEdit, QPushButton, QStyledItemDelegate
 from PyQt6.uic import loadUi
 from PyQt6.QtGui import QIntValidator
 import sympy as sp
@@ -9,6 +12,13 @@ from ModelIntegration import IntegrationModel
 from MPLCanvas import MPLCanvas
 import sys
 from PyQt6.QtWidgets import QApplication
+
+# Custom Delegate to render the pixmap
+class PlotDelegate(QStyledItemDelegate):
+    def paint(self, painter, option, index):
+        pixmap = index.data(Qt.ItemDataRole.DecorationRole)
+        if pixmap:
+            painter.drawPixmap(option.rect, pixmap)
 
 class ViewListFonction(QDockWidget):
 
@@ -25,12 +35,17 @@ class ViewListFonction(QDockWidget):
 
         self.fonctionsListView.setModel(model)
 
+
+
+
         self.model = model
 
+        self.setFloating(True)
         #fonctionnement
         self.fonctionLineEdit.textEdited.connect(self.setAjouter)
 
         self.ajouterPushButton.clicked.connect(self.addFonction)
+
 
 
     # def updateModel(self, boolean):
@@ -41,6 +56,6 @@ class ViewListFonction(QDockWidget):
         self.ajouterPushButton.setEnabled(True)
 
     def addFonction(self):
-        self.model.addItem(str(self.fonctionLineEdit.text()))
+        self.model.addItem(IntegrationModel(str(self.fonctionLineEdit.text())))
 
 

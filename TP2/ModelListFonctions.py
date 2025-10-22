@@ -23,6 +23,8 @@ class ModelListFonctions(QAbstractListModel):
             return fonction
         return None
 
+
+
     def rowCount(self, parent=QModelIndex()):
         return len(self.__fonctions)
 
