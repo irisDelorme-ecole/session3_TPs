@@ -16,6 +16,8 @@ class MPLCanvas(FigureCanvas):
         super().__init__(self.__fig)
         plt.draw()  # makes blank plot with axes visible
 
+
+
     def exporter(self):
         file_path, _ = QFileDialog.getSaveFileName(self,
                                                    "Save File", "", "PNG files(*.png);;All Files(*)")
@@ -29,22 +31,35 @@ class MPLCanvas(FigureCanvas):
     def show_sum(self):
         x = sp.symbols('x')
         f = sp.lambdify(x,self.model_integration.fonction, 'numpy')
-        a = 0
-        b = 5
-        N = 10
-        n = 10
+        a = self.model_integration.borne_inf
+        b = self.model_integration.borne_sup
+        N = self.model_integration.nb_boites
 
-        x = np.linspace(a, b, N + 1)
+
+        x = np.linspace(a, b, N + 1) #evaluation
         y = f(x)
 
-        X = np.linspace(a, b, n * N + 1)
+        X = np.linspace(a, b, N * N + 1) #rectangles
         Y = f(X)
 
+
+        if self.model_integration.is_gauche:
+            side = -1
+            x_toside = x[:-1]  # Left endpoints
+            y_toside = y[:-1]
+        else:
+            side = 1
+            x_toside = x[1:]  # Left endpoints
+            y_toside = y[1:]
+
         plt.plot(X, Y, 'b')
-        x_left = x[:-1]  # Left endpoints
-        y_left = y[:-1]
-        plt.plot(x_left, y_left, 'b.', markersize=10)
-        plt.bar(x_left, y_left, width=(b - a) / N, alpha=0.2, align='edge', edgecolor='b')
+
+
+        plt.bar(x_toside, y_toside, width=-side*(b - a) / N, alpha=1, align='edge', facecolor="None", edgecolor="orange" )
+
+        #code pour la visualisation d'une somme de riemman par patrick walls sur github :
+        #https://patrickwalls.github.io/mathematicalpython/integration/riemann-sums/
+        #bien sur avec changements pour integrer avec mon propre code.
 
 
     def plot(self):

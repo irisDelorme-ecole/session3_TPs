@@ -1,4 +1,6 @@
 import sympy as sp
+
+
 from sympy import latex
 
 
@@ -11,6 +13,7 @@ class IntegrationModel():
 
 
     def __init__(self, fonction="x"):
+        super().__init__()
         x = sp.symbols('x')
         self.fonction = fonction
 
@@ -43,7 +46,7 @@ class IntegrationModel():
 
     @property
     def is_gauche(self):
-        return self.is_gauche
+        return self.__is_gauche
 
     @is_gauche.setter
     def is_gauche(self, value):

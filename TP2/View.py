@@ -1,3 +1,6 @@
+import traceback
+
+from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtWidgets import QMainWindow, QLineEdit, QPushButton, QVBoxLayout, QWidget, QRadioButton, QComboBox, QSlider, QFileDialog, QDockWidget, QListView
 from PyQt6.uic import loadUi
 from PyQt6.QtGui import QIntValidator, QAction
@@ -26,6 +29,8 @@ class View(QMainWindow):
 
 
     fonction:IntegrationModel
+
+    signal_update = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
@@ -70,14 +75,17 @@ class View(QMainWindow):
 
         self.calculerPushButton.clicked.connect(self.affiche)
 
-        self.nombreSlider.setRange(1,25)
+        self.nombreSlider.setRange(1,100)
         self.nombreSlider.setSingleStep(1)
         self.nombreSlider.setValue(1)
 
-        self.nombreSlider.sliderMoved.connect(self.set_nb_boites)
+
+        self.nombreSlider.valueChanged.connect(self.set_nb_boites)
+
 
         self.quitterAction.triggered.connect(self.close)
         self.exporterAction.triggered.connect(self.exporter)
+
 
     def getList(self):
         self.viewListFonctions = ViewListFonction(self.listeModel, self)
@@ -91,8 +99,9 @@ class View(QMainWindow):
         self.sumLineEdit.setText(str(self.fonction.sum()))
         self.integraleLineEdit.setText(str(self.fonction.integrate()))
 
-    def set_nb_boites(self, value):
-        self.fonction.nb_boites = int(value)
+    def set_nb_boites(self):
+        self.fonction.nb_boites = self.nombreSlider.sliderPosition()
+
 
     def set_fonction(self, value):
         self.fonction.fonction = value
@@ -123,8 +132,3 @@ class View(QMainWindow):
         else:
             self.borneSupLineEdit.setStyleSheet("color: black; background-color: lightcoral;")
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    ex3 = View()
-    ex3.show()
-    sys.exit(app.exec())

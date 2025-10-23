@@ -46,6 +46,8 @@ class ViewListFonction(QDockWidget):
 
         self.ajouterPushButton.clicked.connect(self.addFonction)
 
+        self.fonctionsListView.#fix
+
 
 
     # def updateModel(self, boolean):
@@ -54,6 +56,7 @@ class ViewListFonction(QDockWidget):
 
     def setAjouter(self):
         self.ajouterPushButton.setEnabled(True)
+
 
     def addFonction(self):
         self.model.addItem(IntegrationModel(str(self.fonctionLineEdit.text())))
