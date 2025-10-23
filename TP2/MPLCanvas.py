@@ -2,6 +2,7 @@ import numpy as np
 from PyQt6.QtWidgets import QFileDialog
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
+import matplotlib.patches as patch
 import ModelIntegration
 import sympy as sp
 
@@ -26,13 +27,25 @@ class MPLCanvas(FigureCanvas):
             print("Save operation canceled.")
 
     def show_sum(self):
-        #calc etendu
-        e = (self.model_integration.borne_sup-self.model_integration.borne_inf)/self.model_integration.nb_boites
         x = sp.symbols('x')
-        lines = [x+1 for x in range(0,self.model_integration.nb_boites)]#[(self.model_integration.fonction.subs(x, self.model_integration.borne_inf + (i * e)) for i in range(0, self.model_integration.nb_boites + 1))]
+        f = sp.lambdify(x,self.model_integration.fonction, 'numpy')
+        a = 0
+        b = 5
+        N = 10
+        n = 10
 
+        x = np.linspace(a, b, N + 1)
+        y = f(x)
 
-        self.__axe.vlines(x=[x+1 for x in range(0,self.model_integration.nb_boites)],ymin=0,ymax=lines)
+        X = np.linspace(a, b, n * N + 1)
+        Y = f(X)
+
+        plt.plot(X, Y, 'b')
+        x_left = x[:-1]  # Left endpoints
+        y_left = y[:-1]
+        plt.plot(x_left, y_left, 'b.', markersize=10)
+        plt.bar(x_left, y_left, width=(b - a) / N, alpha=0.2, align='edge', edgecolor='b')
+
 
     def plot(self):
         self.__axe.clear()
