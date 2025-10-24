@@ -18,7 +18,6 @@ class IntegrationModel():
         self.fonction = fonction
 
 
-
     def integrate(self):
         x = sp.symbols('x')
         return sp.integrate(self.__fonction, (x, self.borne_inf, self.borne_sup))
@@ -91,6 +90,14 @@ class IntegrationModel():
     def __str__(self):
 
         return str(self.fonction)
+
+    def __eq__(self, other):
+        if other is None:
+            return False
+        elif other.__class__.__name__ != self.__class__.__name__:
+            return False
+        else:
+            return self.__str__() == other.__str__()
 
 # test = IntegrationModel()
 # test.fonction = "x**3"

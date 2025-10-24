@@ -5,12 +5,12 @@ from PyQt6.QtWidgets import QApplication
 
 from View import View
 
+if __name__ == "__main__":
+    def qt_exception_hook(exctype, value, tb):
+        traceback.print_exception(exctype, value, tb)
 
-def qt_exception_hook(exctype, value, tb):
-    traceback.print_exception(exctype, value, tb)
-
-sys.excepthook = qt_exception_hook
-app = QApplication(sys.argv)
-ex3 = View()
-ex3.show()
-sys.exit(app.exec())
+    sys.excepthook = qt_exception_hook
+    app = QApplication(sys.argv)
+    ex3 = View()
+    ex3.show()
+    sys.exit(app.exec())

@@ -1,5 +1,5 @@
 from PyQt6 import QtWidgets, QtGui
-from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtCore import Qt, QSize, QModelIndex
 from PyQt6.QtGui import QColor, QAction, QTextDocument, QPainter, QPixmap
 import matplotlib.pyplot as plt
 import io
@@ -44,9 +44,14 @@ class ViewListFonction(QDockWidget):
         #fonctionnement
         self.fonctionLineEdit.textEdited.connect(self.setAjouter)
 
+        self.enregistrerPushButton.setEnabled(True)
+        self.enregistrerPushButton.clicked.connect(self.model.export)
+
+        self.fonctionsListView.clicked.connect(self.activateSupprimer)
+
         self.ajouterPushButton.clicked.connect(self.addFonction)
 
-        self.fonctionsListView.#fix
+        self.supprimerPushButton.clicked.connect(self.removeFonction)
 
 
 
@@ -57,8 +62,13 @@ class ViewListFonction(QDockWidget):
     def setAjouter(self):
         self.ajouterPushButton.setEnabled(True)
 
+    def activateSupprimer(self):
+        self.supprimerPushButton.setEnabled(True)
 
     def addFonction(self):
         self.model.addItem(IntegrationModel(str(self.fonctionLineEdit.text())))
 
+
+    def removeFonction(self):
+        self.model.removeItem((QModelIndex(self.fonctionsListView.selectedIndexes()[0]).row()))
 
