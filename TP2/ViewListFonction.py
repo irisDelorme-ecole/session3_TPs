@@ -36,7 +36,7 @@ class ViewListFonction(QDockWidget):
         self.setFloating(True)
 
         # Delegate: tune desired_height to control rendered size
-        self.delegate = LatexDelegate(self, pixmap_fontsize=22, desired_height=80, padding=8)
+        self.delegate = LatexDelegate(self, pixmap_fontsize=18, desired_height=50, padding=4)
 
         self.fonctionsListView.setItemDelegate(self.delegate)
         self.fonctionsListView.setSpacing(6)

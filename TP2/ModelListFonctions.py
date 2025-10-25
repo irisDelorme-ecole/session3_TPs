@@ -33,7 +33,7 @@ def latex_to_qpixmap(latex: str, fontsize: int = 18, dpi: int = 200) -> QPixmap:
         dpi=dpi,
         transparent=True,
         bbox_inches="tight",
-        pad_inches=0.0,
+        pad_inches=0.1,
     )
     buf.seek(0)
     img_data = buf.read()
@@ -117,6 +117,9 @@ class ModelListFonctions(QAbstractListModel):
             self.__fonctions.remove(item)
             (self.endInsertRows())
 
+    def fonction(self, row: int) -> str:
+        return self.__fonctions[row]
+
 
 # -------------------------
 # Delegate (paints pixmaps on demand)
@@ -129,7 +132,7 @@ class LatexDelegate(QStyledItemDelegate):
     prevent the default decoration (DecorationRole) from being drawn twice.
     """
 
-    def __init__(self, parent=None, pixmap_fontsize: int = 20, desired_height: int = 72, padding: int = 8):
+    def __init__(self, parent=None, pixmap_fontsize: int = 20, desired_height: int = 84, padding: int = 8):
         super().__init__(parent)
         self.pixmap_fontsize = pixmap_fontsize
         self.desired_height = desired_height

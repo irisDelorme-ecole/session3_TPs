@@ -1,12 +1,12 @@
-from PyQt6.QtCore import pyqtSignal, QModelIndex, Qt
+from PyQt6.QtCore import pyqtSignal, QModelIndex, Qt, QSize
 from PyQt6.QtWidgets import QMainWindow, QLineEdit, QPushButton, QVBoxLayout, QWidget, QRadioButton, QComboBox, QSlider, QFileDialog, QDockWidget, QListView
 from PyQt6.uic import loadUi
-from PyQt6.QtGui import QIntValidator, QAction
+from PyQt6.QtGui import QIntValidator, QAction, QIcon
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from ModelIntegration import IntegrationModel
 from MPLCanvas import MPLCanvas
 from ViewListFonction import ViewListFonction
-from ModelListFonctions import ModelListFonctions
+from ModelListFonctions import ModelListFonctions, cached_latex_to_qpixmap, LatexDelegate
 
 
 class View(QMainWindow):
@@ -39,6 +39,29 @@ class View(QMainWindow):
 
 
         self.fonctionComboBox.currentTextChanged.connect(self.set_fonction)
+
+        self.delegate = LatexDelegate(self, pixmap_fontsize=22, desired_height=80, padding=8)
+
+        # Populate DecorationRole with icons sized to delegate.desired_height so the closed QComboBox displays selection
+        max_w = 0
+        max_h = 0
+        icons = []
+        for row in range(self.listeModel.rowCount()):
+            fonction = self.listeModel.fonction(row)
+            orig = cached_latex_to_qpixmap(fonction.__str__(), fontsize=self.delegate.pixmap_fontsize, dpi=200)
+            if not orig.isNull():
+                pix = orig.scaledToHeight(self.delegate.desired_height, mode=Qt.TransformationMode.SmoothTransformation)
+                icons.append((row, QIcon(pix), pix))
+                max_w = max(max_w, pix.width())
+                max_h = max(max_h, pix.height())
+
+        for row, icon, pix in icons:
+            # set the DecorationRole only for combo's use
+            self.fonctionComboBox.setItemData(row, icon, role=Qt.ItemDataRole.DecorationRole)
+
+        if max_w > 0 and max_h > 0:
+            self.fonctionComboBox.setIconSize(QSize(max_w, max_h))
+            self.fonctionComboBox.setMinimumHeight(max_h + 12)
 
         model_index = self.listeModel.index(0,0)
 
