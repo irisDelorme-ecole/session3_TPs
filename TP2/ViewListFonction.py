@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import QDockWidget, QListView, QLineEdit, QPushButton, QMes
 from PyQt6.uic import loadUi
 import sympy as sp
 from ModelIntegration import IntegrationModel
+from TP2.ModelListFonctions import LatexDelegate
 
 
 # Custom Delegate to render the pixmap
@@ -34,6 +35,11 @@ class ViewListFonction(QDockWidget):
 
         self.setFloating(True)
 
+        # Delegate: tune desired_height to control rendered size
+        self.delegate = LatexDelegate(self, pixmap_fontsize=22, desired_height=80, padding=8)
+
+        self.fonctionsListView.setItemDelegate(self.delegate)
+        self.fonctionsListView.setSpacing(6)
         #fonctionnement
         self.fonctionLineEdit.textEdited.connect(self.setAjouter)
 

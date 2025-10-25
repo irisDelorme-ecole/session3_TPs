@@ -1,7 +1,52 @@
-from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, pyqtSignal
+import io
+from functools import lru_cache
+
+from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, pyqtSignal, QSize
+from PyQt6.QtGui import QImage, QPixmap, QIcon, QPainter
+from matplotlib.backends.backend_template import FigureCanvas
+from matplotlib.figure import Figure
+
 from ModelIntegration import IntegrationModel
-from PyQt6.QtWidgets import QMessageBox
+from PyQt6.QtWidgets import QMessageBox, QStyleOptionViewItem, QApplication, QStyle, QStyledItemDelegate
 import json
+
+
+# -------------------------
+# Renderer (matplotlib -> QPixmap)
+# -------------------------
+def latex_to_qpixmap(latex: str, fontsize: int = 18, dpi: int = 200) -> QPixmap:
+    """
+    Render a LaTeX math string (math mode) to a transparent QPixmap using matplotlib.
+    """
+    fig = Figure(figsize=(0.01, 0.01))
+    fig.patch.set_alpha(0.0)
+    canvas = FigureCanvas(fig)
+
+    # Put formula in math mode
+    fig.text(0, 0, f"${latex}$", fontsize=fontsize)
+    canvas.draw()
+
+    buf = io.BytesIO()
+    fig.savefig(
+        buf,
+        format="png",
+        dpi=dpi,
+        transparent=True,
+        bbox_inches="tight",
+        pad_inches=0.0,
+    )
+    buf.seek(0)
+    img_data = buf.read()
+    qimg = QImage.fromData(img_data)
+    pix = QPixmap.fromImage(qimg)
+    return pix
+
+
+# Cache rendered pixmaps (keyed by formula and fontsize/dpi)
+@lru_cache(maxsize=512)
+def cached_latex_to_qpixmap(latex: str, fontsize: int = 18, dpi: int = 200) -> QPixmap:
+    return latex_to_qpixmap(latex, fontsize=fontsize, dpi=dpi)
+
 
 class ModelListFonctions(QAbstractListModel):
 
@@ -44,11 +89,17 @@ class ModelListFonctions(QAbstractListModel):
             return None
         fonction = self.__fonctions[index.row()]
         if role == Qt.ItemDataRole.DisplayRole:
-            return fonction.__str__()
-        elif role == Qt.ItemDataRole.UserRole:
+            # Return empty so default drawing doesn't show raw text.
+            return ""
+        if role == Qt.ItemDataRole.UserRole:
             return fonction
+        if role == Qt.ItemDataRole.DecorationRole:
+            # Provide a tiny icon to keep compatibility; delegate will handle full render
+            pix = cached_latex_to_qpixmap(fonction.__str__(), fontsize=12, dpi=150)
+            if not pix.isNull():
+                return QIcon(pix)
+            return None
         return None
-
 
 
     def rowCount(self, parent=QModelIndex()):
@@ -65,3 +116,73 @@ class ModelListFonctions(QAbstractListModel):
             item = self.__fonctions[index]
             self.__fonctions.remove(item)
             (self.endInsertRows())
+
+
+# -------------------------
+# Delegate (paints pixmaps on demand)
+# -------------------------
+class LatexDelegate(QStyledItemDelegate):
+    """
+    Delegate that paints a cached LaTeX pixmap (rendered with matplotlib).
+    It draws selection/background using the view's style, then paints the pixmap
+    centered vertically at a left padding. It avoids calling super().paint to
+    prevent the default decoration (DecorationRole) from being drawn twice.
+    """
+
+    def __init__(self, parent=None, pixmap_fontsize: int = 20, desired_height: int = 72, padding: int = 8):
+        super().__init__(parent)
+        self.pixmap_fontsize = pixmap_fontsize
+        self.desired_height = desired_height
+        self.padding = padding
+
+    def paint(self, painter: QPainter, option, index):
+        # Instead of calling super().paint (which draws decoration/icon + text),
+        # use initStyleOption to get a styled option and then draw only the
+        # background/selection/focus via the style, but with text/icon cleared.
+        opt = QStyleOptionViewItem(option)
+        self.initStyleOption(opt, index)
+
+        # Clear text and icon so the style doesn't draw them (prevents duplicates)
+        opt.text = ""
+        opt.icon = QIcon()
+
+        # Draw background/selection/etc using the style so native look is preserved.
+        style = option.widget.style() if option.widget else QApplication.style()
+        style.drawControl(QStyle.ControlElement.CE_ItemViewItem, opt, painter, option.widget)
+
+        # Now draw our LaTeX pixmap
+        fonction = index.data(Qt.ItemDataRole.UserRole)
+        pix = None
+        if fonction:
+            orig = cached_latex_to_qpixmap(fonction.__str__(), fontsize=self.pixmap_fontsize, dpi=200)
+            if not orig.isNull():
+                pix = orig.scaledToHeight(self.desired_height, mode=Qt.TransformationMode.SmoothTransformation)
+
+        painter.save()
+        rect = option.rect
+        if pix and not pix.isNull():
+            x = rect.x() + self.padding
+            y = rect.y() + (rect.height() - pix.height()) // 2
+            painter.drawPixmap(x, y, pix)
+        else:
+            painter.setPen(option.palette.text().color())
+            painter.drawText(rect, Qt.AlignmentFlag.AlignCenter, "…")
+
+        # Draw focus rect if needed (optional subtle rectangle)
+        if option.state & QStyle.StateFlag.State_HasFocus:
+            pen = painter.pen()
+            pen.setColor(option.palette.highlight().color())
+            painter.setPen(pen)
+            r = rect.adjusted(1, 1, -1, -1)
+            painter.drawRect(r)
+
+        painter.restore()
+
+    def sizeHint(self, option, index) -> QSize:
+        formula = index.data(Qt.ItemDataRole.UserRole)
+        if formula:
+            orig = cached_latex_to_qpixmap(formula.__str__(), fontsize=self.pixmap_fontsize, dpi=200)
+            if not orig.isNull():
+                pix = orig.scaledToHeight(self.desired_height, mode=Qt.TransformationMode.SmoothTransformation)
+                return QSize(pix.width() + 2 * self.padding, pix.height() + 2 * self.padding)
+        return super().sizeHint(option, index)

@@ -92,7 +92,7 @@ class IntegrationModel():
 
     def __str__(self):
 
-        return str(self.fonction)
+        return str(sp.latex(self.fonction))
 
     def __eq__(self, other):
         if other is None:
