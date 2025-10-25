@@ -3,12 +3,11 @@ import numpy as np
 
 
 class IntegrationModel():
-    __fonction:sp.Basic
-    __borne_inf:int = 0
-    __borne_sup:int = 5
-    __nb_boites:int = 1
-    __is_gauche:bool = True
-
+    __fonction: sp.Basic
+    __borne_inf: int = 0
+    __borne_sup: int = 5
+    __nb_boites: int = 1
+    __is_gauche: bool = True
 
     def __init__(self, fonction):
         super().__init__()
@@ -16,33 +15,30 @@ class IntegrationModel():
 
         self.fonction = fonction
 
-
     def integrate(self):
         x = sp.symbols('x')
         return sp.integrate(self.__fonction, (x, self.borne_inf, self.borne_sup))
-
 
     def sum(self):
         x, i, n = sp.symbols('x i n')
         n = self.nb_boites
 
-        #set width
-        delta_x = (self.borne_sup-self.borne_inf)/self.nb_boites
+        # set width
+        delta_x = (self.borne_sup - self.borne_inf) / self.nb_boites
 
-        #points gauche ou droite (gauche: de borne_inf a borne_sup-largeur des rectangles,
-        #droite: de borne_inf + largeur a borne sup
-        #nb boites pour le nombre de points a evaluer, puisque np selectionne des points a distance egale les uns des autres(rects. toujours meme largeur)
-        x_gauche = np.linspace(self.borne_inf, self.borne_sup-delta_x, self.nb_boites)
-        x_droite = np.linspace(self.borne_inf+delta_x, self.borne_sup, self.nb_boites)
+        # points gauche ou droite (gauche: de borne_inf a borne_sup-largeur des rectangles,
+        # droite: de borne_inf + largeur a borne sup
+        # nb boites pour le nombre de points a evaluer, puisque np selectionne des points a distance egale les uns des autres(rects. toujours meme largeur)
+        x_gauche = np.linspace(self.borne_inf, self.borne_sup - delta_x, self.nb_boites)
+        x_droite = np.linspace(self.borne_inf + delta_x, self.borne_sup, self.nb_boites)
 
         f = sp.lambdify(x, self.__fonction, modules="numpy")
 
         # make sum
         if self.__is_gauche:
-            return np.sum(f(x_gauche)*delta_x)
+            return np.sum(f(x_gauche) * delta_x)
         else:
-            return np.sum(f(x_droite)*delta_x)
-
+            return np.sum(f(x_droite) * delta_x)
 
     @property
     def is_gauche(self):
@@ -57,11 +53,9 @@ class IntegrationModel():
         return self.__fonction
 
     @fonction.setter
-    def fonction(self, value:str):
-        #TODO: set validator?
+    def fonction(self, value: str):
+        # TODO: set validator?
         self.__fonction = sp.sympify(value)
-
-
 
     @property
     def borne_inf(self):

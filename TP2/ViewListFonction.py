@@ -14,22 +14,18 @@ from TP2.ModelListFonctions import LatexDelegate
 #             painter.drawPixmap(option.rect, pixmap)
 
 class ViewListFonction(QDockWidget):
-
     fonctionsListView: QListView
     fonctionLineEdit: QLineEdit
-    ajouterPushButton:QPushButton
-    supprimerPushButton:QPushButton
-    enregistrerPushButton:QPushButton
+    ajouterPushButton: QPushButton
+    supprimerPushButton: QPushButton
+    enregistrerPushButton: QPushButton
 
     def __init__(self, model, parent):
         super().__init__(parent)
 
-        loadUi("ui/listeFonctions.ui",self)
+        loadUi("ui/listeFonctions.ui", self)
 
         self.fonctionsListView.setModel(model)
-
-
-
 
         self.model = model
 
@@ -40,7 +36,7 @@ class ViewListFonction(QDockWidget):
 
         self.fonctionsListView.setItemDelegate(self.delegate)
         self.fonctionsListView.setSpacing(6)
-        #fonctionnement
+        # fonctionnement
         self.fonctionLineEdit.textEdited.connect(self.setAjouter)
 
         self.enregistrerPushButton.setEnabled(True)
@@ -75,10 +71,8 @@ class ViewListFonction(QDockWidget):
         if sp.sympify(str(self.fonctionLineEdit.text())).free_symbols <= {x}:
             self.model.addItem(IntegrationModel(str(self.fonctionLineEdit.text())))
         else:
-            QMessageBox.critical(QMessageBox(),"Invalid Function", "la fonction ne respecte pas le format d'une expression sympy.")
-
-
+            QMessageBox.critical(QMessageBox(), "Invalid Function",
+                                 "la fonction ne respecte pas le format d'une expression sympy.")
 
     def removeFonction(self):
         self.model.removeItem((QModelIndex(self.fonctionsListView.selectedIndexes()[0]).row()))
-

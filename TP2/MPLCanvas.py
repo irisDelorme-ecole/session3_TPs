@@ -7,17 +7,15 @@ from sympy import zeros
 import ModelIntegration
 import sympy as sp
 
-class MPLCanvas(FigureCanvas):
 
-    model_integration:ModelIntegration
+class MPLCanvas(FigureCanvas):
+    model_integration: ModelIntegration
 
     def __init__(self, model_integration):
         self.__fig, self.__axe = plt.subplots()
         self.model_integration = model_integration
         super().__init__(self.__fig)
         plt.draw()  # makes blank plot with axes visible
-
-
 
     def exporter(self):
         file_path, _ = QFileDialog.getSaveFileName(self,
@@ -31,12 +29,12 @@ class MPLCanvas(FigureCanvas):
 
     def show_sum(self):
         x = sp.symbols('x')
-        f = sp.lambdify(x,self.model_integration.fonction, 'numpy')
+        f = sp.lambdify(x, self.model_integration.fonction, 'numpy')
         a = self.model_integration.borne_inf
         b = self.model_integration.borne_sup
         n = self.model_integration.nb_boites
 
-        x = np.linspace(a, b, n + 1) #evaluation
+        x = np.linspace(a, b, n + 1)  # evaluation
         y = f(x)
 
         if self.model_integration.is_gauche:
@@ -48,18 +46,18 @@ class MPLCanvas(FigureCanvas):
             x_toside = x[1:]  # Left endpoints
             y_toside = y[1:]
 
-        #rectangles avec un bar graph
+        # rectangles avec un bar graph
         # mpl utilise des "artist" qui ont chacun une patch de type Rectangle
         # pour dessiner ses bar graphs, donc le "bar graph" ici est plus un dessin de n rectangles allant de
         # zero a f(x)
-        plt.bar(x_toside, y_toside, width=-side*(b - a) / n, alpha=1, align='edge', facecolor="None", edgecolor="orange", linewidth=1.5 )
-
+        plt.bar(x_toside, y_toside, width=-side * (b - a) / n, alpha=1, align='edge', facecolor="None",
+                edgecolor="orange", linewidth=1.5)
 
     def plot(self):
         self.__axe.clear()
         y = np.linspace(self.model_integration.borne_inf, self.model_integration.borne_sup, 100)
         x = sp.symbols('x')
-        f = sp.lambdify(x,self.model_integration.fonction, 'numpy')
+        f = sp.lambdify(x, self.model_integration.fonction, 'numpy')
 
         self.__axe.plot(y, f(y))
         self.show_sum()

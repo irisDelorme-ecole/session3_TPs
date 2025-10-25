@@ -49,13 +49,11 @@ def cached_latex_to_qpixmap(latex: str, fontsize: int = 18, dpi: int = 200) -> Q
 
 
 class ModelListFonctions(QAbstractListModel):
-
     updatedSignal = pyqtSignal(bool)
 
     def __init__(self):
 
         super().__init__()
-
 
         self.__fonctions = []
         self.from_dict()
@@ -65,7 +63,6 @@ class ModelListFonctions(QAbstractListModel):
         for i in range(len(self.__fonctions)):
             dict[str(i)] = self.__fonctions[i].__str__()
         return dict
-
 
     def from_dict(self):
         with open('data\listefonctions.json') as json_file:
@@ -78,12 +75,11 @@ class ModelListFonctions(QAbstractListModel):
 
     def export(self):
         with open("data\listeFonctions.json", 'w') as file:
-                json.dump(self.to_dict(), file)
-                file.close()
+            json.dump(self.to_dict(), file)
+            file.close()
         QMessageBox.information(QMessageBox(), "Message", "Liste de fonctions sauvegardée")
 
-
-    def data(self, index, role = ...):
+    def data(self, index, role=...):
 
         if not index.isValid():
             return None
@@ -100,7 +96,6 @@ class ModelListFonctions(QAbstractListModel):
                 return QIcon(pix)
             return None
         return None
-
 
     def rowCount(self, parent=QModelIndex()):
         return len(self.__fonctions)
