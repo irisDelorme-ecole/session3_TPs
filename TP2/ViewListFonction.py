@@ -1,24 +1,16 @@
-from PyQt6 import QtWidgets, QtGui
-from PyQt6.QtCore import Qt, QSize, QModelIndex
-from PyQt6.QtGui import QColor, QAction, QTextDocument, QPainter, QPixmap
-import matplotlib.pyplot as plt
-import io
-from PyQt6.QtWidgets import QDockWidget, QListView, QLineEdit, QPushButton, QStyledItemDelegate
+from PyQt6.QtCore import Qt, QModelIndex
+from PyQt6.QtWidgets import QDockWidget, QListView, QLineEdit, QPushButton, QMessageBox
 from PyQt6.uic import loadUi
-from PyQt6.QtGui import QIntValidator
 import sympy as sp
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from ModelIntegration import IntegrationModel
-from MPLCanvas import MPLCanvas
-import sys
-from PyQt6.QtWidgets import QApplication
+
 
 # Custom Delegate to render the pixmap
-class PlotDelegate(QStyledItemDelegate):
-    def paint(self, painter, option, index):
-        pixmap = index.data(Qt.ItemDataRole.DecorationRole)
-        if pixmap:
-            painter.drawPixmap(option.rect, pixmap)
+# class PlotDelegate(QStyledItemDelegate):
+#     def paint(self, painter, option, index):
+#         pixmap = index.data(Qt.ItemDataRole.DecorationRole)
+#         if pixmap:
+#             painter.drawPixmap(option.rect, pixmap)
 
 class ViewListFonction(QDockWidget):
 
@@ -41,6 +33,7 @@ class ViewListFonction(QDockWidget):
         self.model = model
 
         self.setFloating(True)
+
         #fonctionnement
         self.fonctionLineEdit.textEdited.connect(self.setAjouter)
 
@@ -53,11 +46,17 @@ class ViewListFonction(QDockWidget):
 
         self.supprimerPushButton.clicked.connect(self.removeFonction)
 
-
-
-    # def updateModel(self, boolean):
-    #     print("got into update")
-    #     self.fonctionsListView.update()
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key.Key_Escape:
+            self.close()
+        elif event.key() == Qt.Key.Key_Enter or event.key() == Qt.Key.Key_Return:
+            self.addFonction()
+        elif event.key() == Qt.Key.Key_Delete or event.key() == Qt.Key.Key_Backspace:
+            self.removeFonction()
+        elif event.modifiers() == Qt.KeyboardModifier.ControlModifier and event.key() == Qt.Key.Key_S:
+            self.model.export()
+        else:
+            pass
 
     def setAjouter(self):
         self.ajouterPushButton.setEnabled(True)
@@ -66,7 +65,12 @@ class ViewListFonction(QDockWidget):
         self.supprimerPushButton.setEnabled(True)
 
     def addFonction(self):
-        self.model.addItem(IntegrationModel(str(self.fonctionLineEdit.text())))
+        x = sp.symbols('x')
+        if sp.sympify(str(self.fonctionLineEdit.text())).free_symbols <= {x}:
+            self.model.addItem(IntegrationModel(str(self.fonctionLineEdit.text())))
+        else:
+            QMessageBox.critical(QMessageBox(),"Invalid Function", "la fonction ne respecte pas le format d'une expression sympy.")
+
 
 
     def removeFonction(self):

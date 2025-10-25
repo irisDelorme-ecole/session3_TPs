@@ -1,34 +1,42 @@
 from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, pyqtSignal
 from ModelIntegration import IntegrationModel
-from PyQt6.QtWidgets import QFileDialog
+from PyQt6.QtWidgets import QMessageBox
 import json
 
 class ModelListFonctions(QAbstractListModel):
 
     updatedSignal = pyqtSignal(bool)
 
-    def __init__(self, data=None):
+    def __init__(self):
 
         super().__init__()
-        if data is None:
-            data = [IntegrationModel("x"), IntegrationModel("x**2"), IntegrationModel("x**3")] #default list
-        self.__fonctions = data
+
+
+        self.__fonctions = []
+        self.from_dict()
 
     def to_dict(self):
-        return {f"fonction {fonction.__str__()}": fonction.__str__() for fonction in self.__fonctions}
+        dict = {}
+        for i in range(len(self.__fonctions)):
+            dict[str(i)] = self.__fonctions[i].__str__()
+        return dict
+
+
+    def from_dict(self):
+        with open('data\listefonctions.json') as json_file:
+            data = json.load(json_file)
+        if data.__len__() == 0:
+            pass
+        else:
+            for i in range(data.__len__()):
+                self.addItem(IntegrationModel(data[str(i)]))
 
     def export(self):
-        file_path, _ = QFileDialog.getSaveFileName(None,
-            "Save File", "", "JSON files(*.json);;All Files(*)")
-
-        if file_path:
-            with open(file_path, 'w') as file:
+        with open("data\listeFonctions.json", 'w') as file:
                 json.dump(self.to_dict(), file)
                 file.close()
-            print(f"List saved to {file_path}")
-        else:
-            print("Save operation canceled.")
-        return json.dumps(self.__fonctions)
+        QMessageBox.information(QMessageBox(), "Message", "Liste de fonctions sauvegardée")
+
 
     def data(self, index, role = ...):
 
@@ -52,7 +60,8 @@ class ModelListFonctions(QAbstractListModel):
         (self.endInsertRows())
 
     def removeItem(self, index):
-        self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
-        item = (self.__fonctions)[index]
-        self.__fonctions.remove(item)
-        (self.endInsertRows())
+        if index < self.__fonctions.__len__():
+            self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
+            item = self.__fonctions[index]
+            self.__fonctions.remove(item)
+            (self.endInsertRows())

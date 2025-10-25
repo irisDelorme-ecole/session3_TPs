@@ -2,7 +2,8 @@ import numpy as np
 from PyQt6.QtWidgets import QFileDialog
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
-import matplotlib.patches as patch
+from sympy import zeros
+
 import ModelIntegration
 import sympy as sp
 
@@ -33,15 +34,10 @@ class MPLCanvas(FigureCanvas):
         f = sp.lambdify(x,self.model_integration.fonction, 'numpy')
         a = self.model_integration.borne_inf
         b = self.model_integration.borne_sup
-        N = self.model_integration.nb_boites
+        n = self.model_integration.nb_boites
 
-
-        x = np.linspace(a, b, N + 1) #evaluation
+        x = np.linspace(a, b, n + 1) #evaluation
         y = f(x)
-
-        X = np.linspace(a, b, N * N + 1) #rectangles
-        Y = f(X)
-
 
         if self.model_integration.is_gauche:
             side = -1
@@ -52,14 +48,11 @@ class MPLCanvas(FigureCanvas):
             x_toside = x[1:]  # Left endpoints
             y_toside = y[1:]
 
-        plt.plot(X, Y, 'b')
-
-
-        plt.bar(x_toside, y_toside, width=-side*(b - a) / N, alpha=1, align='edge', facecolor="None", edgecolor="orange" )
-
-        #code pour la visualisation d'une somme de riemman par patrick walls sur github :
-        #https://patrickwalls.github.io/mathematicalpython/integration/riemann-sums/
-        #bien sur avec changements pour integrer avec mon propre code.
+        #rectangles avec un bar graph
+        # mpl utilise des "artist" qui ont chacun une patch de type Rectangle
+        # pour dessiner ses bar graphs, donc le "bar graph" ici est plus un dessin de n rectangles allant de
+        # zero a f(x)
+        plt.bar(x_toside, y_toside, width=-side*(b - a) / n, alpha=1, align='edge', facecolor="None", edgecolor="orange", linewidth=1.5 )
 
 
     def plot(self):

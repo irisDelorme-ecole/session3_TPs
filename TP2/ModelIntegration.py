@@ -1,20 +1,19 @@
 import sympy as sp
-
-
-from sympy import latex
+import numpy as np
 
 
 class IntegrationModel():
-    __fonction:sp.Basic = "x"
+    __fonction:sp.Basic
     __borne_inf:int = 0
     __borne_sup:int = 5
     __nb_boites:int = 1
     __is_gauche:bool = True
 
 
-    def __init__(self, fonction="x"):
+    def __init__(self, fonction):
         super().__init__()
         x = sp.symbols('x')
+
         self.fonction = fonction
 
 
@@ -24,23 +23,25 @@ class IntegrationModel():
 
 
     def sum(self):
-        x, i, n, a = sp.symbols('x i n a')
+        x, i, n = sp.symbols('x i n')
+        n = self.nb_boites
 
         #set width
-        a = (self.borne_sup-self.borne_inf)/self.nb_boites
+        delta_x = (self.borne_sup-self.borne_inf)/self.nb_boites
 
-        #make new function with dx to eval.
-        # f = sp.symbols('f', cls=sp.Function)
-        #f = self.fonction*float(a)
+        #points gauche ou droite (gauche: de borne_inf a borne_sup-largeur des rectangles,
+        #droite: de borne_inf + largeur a borne sup
+        #nb boites pour le nombre de points a evaluer, puisque np selectionne des points a distance egale les uns des autres(rects. toujours meme largeur)
+        x_gauche = np.linspace(self.borne_inf, self.borne_sup-delta_x, self.nb_boites)
+        x_droite = np.linspace(self.borne_inf+delta_x, self.borne_sup, self.nb_boites)
 
-        f = sp.sympify(self.fonction)*a
+        f = sp.lambdify(x, self.__fonction, modules="numpy")
+
         # make sum
         if self.__is_gauche:
-            n = self.nb_boites - 1
-            return sp.summation(f.subs(x,(a*i) + self.borne_inf),(i,0,n)).doit().evalf()
+            return np.sum(f(x_gauche)*delta_x)
         else:
-            n = self.nb_boites
-            return sp.summation(f.subs(x,(a*i) + self.borne_inf), (i, 1, n))
+            return np.sum(f(x_droite)*delta_x)
 
 
     @property
@@ -59,6 +60,8 @@ class IntegrationModel():
     def fonction(self, value:str):
         #TODO: set validator?
         self.__fonction = sp.sympify(value)
+
+
 
     @property
     def borne_inf(self):

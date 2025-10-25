@@ -1,15 +1,10 @@
-import traceback
-
-from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal, QModelIndex, Qt
 from PyQt6.QtWidgets import QMainWindow, QLineEdit, QPushButton, QVBoxLayout, QWidget, QRadioButton, QComboBox, QSlider, QFileDialog, QDockWidget, QListView
 from PyQt6.uic import loadUi
 from PyQt6.QtGui import QIntValidator, QAction
-
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from ModelIntegration import IntegrationModel
 from MPLCanvas import MPLCanvas
-import sys
-from PyQt6.QtWidgets import QApplication
 from ViewListFonction import ViewListFonction
 from ModelListFonctions import ModelListFonctions
 
@@ -38,18 +33,23 @@ class View(QMainWindow):
         loadUi("ui/TP2MainWindow.ui", self)
 
         # setup de base
-        self.fonction = IntegrationModel()
+        self.listeModel = ModelListFonctions()
+
+        self.fonctionComboBox.setModel(self.listeModel)
+
+
+        self.fonctionComboBox.currentTextChanged.connect(self.set_fonction)
+
+        model_index = self.listeModel.index(0,0)
+
+        self.fonction = self.listeModel.data(model_index, Qt.ItemDataRole.UserRole)
         self.canvas = MPLCanvas(self.fonction)
         self.toolbar = NavigationToolbar(self.canvas)
         layout = QVBoxLayout(self.plotWidget)
         layout.addWidget(self.toolbar)
         self.plotWidget.layout().addWidget(self.canvas)
 
-        self.listeModel = ModelListFonctions()
 
-        self.fonctionComboBox.setModel(self.listeModel)
-
-        self.fonctionComboBox.currentTextChanged.connect(self.set_fonction)
 
 
         #self.viewListFonctions.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetMovable | QDockWidget.DockWidgetFeature.DockWidgetFloatable)
