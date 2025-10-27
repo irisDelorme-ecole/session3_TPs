@@ -16,15 +16,24 @@ class MPLCanvas(FigureCanvas):
         plt.draw()  # makes blank plot with axes visible
 
     def exporter(self):
+        msg = QMessageBox()
+        msg.setStyleSheet("background-color : #99afd7")
+
         #basic filedialog pour sauvegarder le canvas.
         file_path, _ = QFileDialog.getSaveFileName(self,
                                                    "Save File", "", "PNG files(*.png);;All Files(*)")
 
         if file_path:
             plt.savefig(file_path, format='png')
-            QMessageBox.information(QMessageBox() ,"Succès!", f"Plot saved as: {file_path}")
+            msg.setText(f"Plot saved as: {file_path}")
+            msg.setWindowTitle("Succès!")
+            msg.setIcon(QMessageBox.Icon.Information)
         else:
-            QMessageBox.warning(QMessageBox() ,"Oops", "Ça n'a pas marché....")
+            msg.setText("Ça n'a pas marché.....")
+            msg.setWindowTitle("Oops....")
+            msg.setIcon(QMessageBox.Icon.Warning)
+
+        msg.exec()
 
     def show_sum(self):
         x = sp.symbols('x')

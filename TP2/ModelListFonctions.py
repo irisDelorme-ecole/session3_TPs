@@ -63,7 +63,7 @@ class ModelListFonctions(QAbstractListModel):
         return dict
 
     def from_dict(self): #déserialiseur
-        with open('data\listefonctions.json') as json_file:
+        with open("data/listefonctions.json") as json_file:
             data = json.load(json_file)
         if data.__len__() == 0:
             pass
@@ -72,10 +72,16 @@ class ModelListFonctions(QAbstractListModel):
                 self.addItem(IntegrationModel(data[str(i)]))
 
     def enregistrer(self):
-        with open("data\listeFonctions.json", 'w') as file:
+        msg = QMessageBox()
+        msg.setStyleSheet("background-color : #99afd7")
+
+        with open("data/listeFonctions.json", 'w') as file:
             json.dump(self.to_dict(), file)
             file.close()
-        QMessageBox.information(QMessageBox(), "Message", "Liste de fonctions sauvegardée")
+        msg.setText("liste de fonctions sauvegardée")
+        msg.setWindowTitle("Succès!")
+        msg.setIcon(QMessageBox.Icon.Information)
+        msg.exec()
 
     def data(self, index, role=...):
 

@@ -98,7 +98,3 @@ class IntegrationModel():
             return False
         else:
             return self.__str__() == other.__str__()
-
-# test = IntegrationModel()
-# test.fonction = "x**3"
-# print(test.sum())
