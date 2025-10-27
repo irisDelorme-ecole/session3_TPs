@@ -12,6 +12,12 @@ if __name__ == "__main__":
 
     sys.excepthook = qt_exception_hook
     app = QApplication(sys.argv)
+
+    with open('ui/style.qss', 'r') as file:
+        style = file.read()
+    app.setStyleSheet(style)
+
+
     ex3 = View()
     ex3.show()
     sys.exit(app.exec())

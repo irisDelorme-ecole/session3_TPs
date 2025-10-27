@@ -1,6 +1,5 @@
-from PyQt6.QtCore import pyqtSignal, QModelIndex, Qt, QSize
-from PyQt6.QtWidgets import QMainWindow, QLineEdit, QPushButton, QVBoxLayout, QWidget, QRadioButton, QComboBox, QSlider, \
-    QFileDialog, QDockWidget, QListView
+from PyQt6.QtCore import pyqtSignal, Qt, QSize
+from PyQt6.QtWidgets import QMainWindow, QLineEdit, QPushButton, QVBoxLayout, QWidget, QRadioButton, QComboBox, QSlider
 from PyQt6.uic import loadUi
 from PyQt6.QtGui import QIntValidator, QAction, QIcon
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
@@ -31,16 +30,18 @@ class View(QMainWindow):
 
         loadUi("ui/TP2MainWindow.ui", self)
 
-        # setup de base
+
+
+        # setup model pour liste et combobox
         self.listeModel = ModelListFonctions()
 
         self.fonctionComboBox.setModel(self.listeModel)
 
-        self.fonctionComboBox.currentTextChanged.connect(self.set_fonction)
 
+        #make both cute
         self.delegate = LatexDelegate(self, pixmap_fontsize=22, desired_height=80, padding=8)
 
-        # Populate DecorationRole with icons sized to delegate.desired_height so the closed QComboBox displays selection
+        # Populate DecorationRole with icons sized to delegate.desired_height so the closed QComboBox displays selection(from github copilot)(voir testWithCopilot.py)
         max_w = 0
         max_h = 0
         icons = []
@@ -70,7 +71,9 @@ class View(QMainWindow):
         layout.addWidget(self.toolbar)
         self.plotWidget.layout().addWidget(self.canvas)
 
-        # self.viewListFonctions.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetMovable | QDockWidget.DockWidgetFeature.DockWidgetFloatable)
+        self.fonctionComboBox.currentIndexChanged.connect(self.set_fonction)
+
+
         # fonctionnement
         self.validatorInf = QIntValidator(self)
 
@@ -79,6 +82,9 @@ class View(QMainWindow):
         self.validatorSup = QIntValidator(self)
 
         self.borneSupLineEdit.setValidator(self.validatorSup)
+
+        self.calculerPushButton.setEnabled(False)
+
 
         self.borneSupLineEdit.textChanged.connect(self.validate_sup)
         self.borneInfLineEdit.textChanged.connect(self.validate_inf)
@@ -109,8 +115,7 @@ class View(QMainWindow):
     def keyPressEvent(self, event):
         if event.key() == Qt.Key.Key_Escape:
             self.close()
-        elif (
-                event.key() == Qt.Key.Key_Enter or event.key() == Qt.Key.Key_Return) and self.calculerPushButton.isEnabled():
+        elif (event.key() == Qt.Key.Key_Enter or event.key() == Qt.Key.Key_Return) and self.calculerPushButton.isEnabled():
             self.affiche()
         elif event.modifiers() == Qt.KeyboardModifier.ControlModifier and event.key() == Qt.Key.Key_S:
             self.canvas.export()
@@ -118,6 +123,8 @@ class View(QMainWindow):
             pass
 
     def affiche(self):
+        #1: fix canvas model vs view model not being in sync
+        self.canvas.set_fonction(self.fonction)
         self.canvas.plot()
         self.sumLineEdit.setText(str(self.fonction.sum()))
         self.integraleLineEdit.setText(str(self.fonction.integrate()))
@@ -125,8 +132,12 @@ class View(QMainWindow):
     def set_nb_boites(self):
         self.fonction.nb_boites = self.nombreSlider.sliderPosition()
 
-    def set_fonction(self, value):
-        self.fonction.fonction = value
+    def set_fonction(self, index):
+        text = self.listeModel.fonction(index).__str__()
+        print(text)
+        self.fonction = IntegrationModel(text)
+        self.validate_inf(self.borneInfLineEdit.text())
+        self.validate_sup(self.borneSupLineEdit.text())
 
     def set_gaucheSum(self):
         self.fonction.is_gauche = True
@@ -137,18 +148,25 @@ class View(QMainWindow):
     def validate_inf(self, texte):
         state, _, _ = self.validatorInf.validate(texte, 0)
 
-        if state == QIntValidator.State.Acceptable:
-            self.borneInfLineEdit.setStyleSheet("color: black; background-color: white;")
+        if state == QIntValidator.State.Acceptable and int(texte) < int(self.fonction.borne_sup):
+            self.borneInfLineEdit.setStyleSheet("color: #233c67; background-color: white;")
             self.fonction.borne_inf = int(texte)
-
+            state, _, _ = self.validatorSup.validate(self.borneSupLineEdit.text(), 0)
+            if state == QIntValidator.State.Acceptable:
+                self.calculerPushButton.setEnabled(True)
         else:
             self.borneInfLineEdit.setStyleSheet("color: black; background-color: lightcoral;")
+            self.calculerPushButton.setEnabled(False)
 
     def validate_sup(self, texte):
         state, _, _ = self.validatorSup.validate(texte, 0)
 
         if state == QIntValidator.State.Acceptable and int(texte) > int(self.fonction.borne_inf):
-            self.borneSupLineEdit.setStyleSheet("color: black; background-color: white;")
+            self.borneSupLineEdit.setStyleSheet("color: #233c67; background-color: white;")
             self.fonction.borne_sup = int(self.borneSupLineEdit.text())
+            state, _, _ = self.validatorInf.validate(self.borneInfLineEdit.text(), 0)
+            if state == QIntValidator.State.Acceptable:
+                self.calculerPushButton.setEnabled(True)
         else:
             self.borneSupLineEdit.setStyleSheet("color: black; background-color: lightcoral;")
+            self.calculerPushButton.setEnabled(False)

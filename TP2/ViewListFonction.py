@@ -6,13 +6,6 @@ from ModelIntegration import IntegrationModel
 from TP2.ModelListFonctions import LatexDelegate
 
 
-# Custom Delegate to render the pixmap
-# class PlotDelegate(QStyledItemDelegate):
-#     def paint(self, painter, option, index):
-#         pixmap = index.data(Qt.ItemDataRole.DecorationRole)
-#         if pixmap:
-#             painter.drawPixmap(option.rect, pixmap)
-
 class ViewListFonction(QDockWidget):
     fonctionsListView: QListView
     fonctionLineEdit: QLineEdit

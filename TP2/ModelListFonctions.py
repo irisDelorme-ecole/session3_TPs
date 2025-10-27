@@ -91,7 +91,7 @@ class ModelListFonctions(QAbstractListModel):
             return fonction
         if role == Qt.ItemDataRole.DecorationRole:
             # Provide a tiny icon to keep compatibility; delegate will handle full render
-            pix = cached_latex_to_qpixmap(fonction.__str__(), fontsize=12, dpi=150)
+            pix = cached_latex_to_qpixmap(fonction.latex(), fontsize=12, dpi=150)
             if not pix.isNull():
                 return QIcon(pix)
             return None
@@ -149,7 +149,7 @@ class LatexDelegate(QStyledItemDelegate):
         style.drawControl(QStyle.ControlElement.CE_ItemViewItem, opt, painter, option.widget)
 
         # Now draw our LaTeX pixmap
-        fonction = index.data(Qt.ItemDataRole.UserRole)
+        fonction = index.data(Qt.ItemDataRole.UserRole).latex()
         pix = None
         if fonction:
             orig = cached_latex_to_qpixmap(fonction.__str__(), fontsize=self.pixmap_fontsize, dpi=200)
