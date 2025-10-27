@@ -1,10 +1,21 @@
 QLabel { color : #233c67 }
 
-QGroupBox:title {
-    color: #233c67
-    }
 
-QMainWindow { background-color : #ccdbee}
+QGroupBox::QRadioButton {
+background-color : #233c67}
+
+QMainWindow { background-color : #ccdbee
+}
+
+QMenuBar { color : #233c67}
+
+QMenu { background-color : #6888be}
+
+QLineEdit { background-color : #99afd7}
+
+
+
+QComboBox { background-color: #99afd7}
 
 QPushButton {
     background-color: #99afd7;
@@ -31,6 +42,8 @@ QLineEdit {
         color : #233c67
         background-color : #ccdbee
 }
+
+QDockWidget { color: #99afd7}
 
 
 
