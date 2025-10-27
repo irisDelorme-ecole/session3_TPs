@@ -1,4 +1,10 @@
-#!/usr/bin/env python3
+"""
+dans ce fichier se trouve tout le code généré par github Copilot le samedi 25 octobre.
+il porte uniquement sur l'affichage du combobox et du listview et sert à
+afficher les fonctions en utilisant les fonctionnalités LaTeX
+implementées par matplotlib.
+
+"""
 """
 PyQt6 demo: QAbstractListModel + QStyledItemDelegate to render LaTeX formulas.
 

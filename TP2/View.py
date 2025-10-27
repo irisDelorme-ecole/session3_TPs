@@ -84,7 +84,7 @@ class View(QMainWindow):
         self.borneSupLineEdit.setValidator(self.validatorSup)
 
         self.calculerPushButton.setEnabled(False)
-
+        self.exporterPushButton.clicked.connect(self.exporter)
 
         self.borneSupLineEdit.textChanged.connect(self.validate_sup)
         self.borneInfLineEdit.textChanged.connect(self.validate_inf)
