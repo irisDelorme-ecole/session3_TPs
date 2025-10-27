@@ -1,7 +1,9 @@
 from PyQt6.QtCore import Qt, QModelIndex
-from PyQt6.QtWidgets import QDockWidget, QListView, QLineEdit, QPushButton, QMessageBox
+from PyQt6.QtWidgets import QDockWidget, QListView, QLineEdit, QPushButton, QMessageBox, QSizePolicy
 from PyQt6.uic import loadUi
 import sympy as sp
+from PyQt6.uic.properties import QtCore
+
 from ModelIntegration import IntegrationModel
 from TP2.ModelListFonctions import LatexDelegate
 

@@ -66,12 +66,13 @@ class View(QMainWindow):
 
         self.fonction = self.listeModel.data(model_index, Qt.ItemDataRole.UserRole)
         self.canvas = MPLCanvas(self.fonction)
-        self.toolbar = NavigationToolbar(self.canvas)
+
         layout = QVBoxLayout(self.plotWidget)
-        layout.addWidget(self.toolbar)
+
         self.plotWidget.layout().addWidget(self.canvas)
 
         self.fonctionComboBox.currentIndexChanged.connect(self.set_fonction)
+
 
 
         # fonctionnement
@@ -99,6 +100,8 @@ class View(QMainWindow):
         self.nombreSlider.setRange(1, 100)
         self.nombreSlider.setSingleStep(1)
         self.nombreSlider.setValue(1)
+        self.nombreSlider.setTickPosition(QSlider.TickPosition.TicksAbove)
+        self.nombreSlider.setTickInterval(5)
 
         self.nombreSlider.valueChanged.connect(self.set_nb_boites)
 

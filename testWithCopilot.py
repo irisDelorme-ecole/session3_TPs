@@ -37,7 +37,6 @@ from PyQt6.QtWidgets import (
     QListView,
     QComboBox,
     QLabel,
-    QSizePolicy,
     QStyledItemDelegate,
     QStyle,
     QStyleOptionViewItem,
