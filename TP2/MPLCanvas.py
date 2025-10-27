@@ -33,8 +33,8 @@ class MPLCanvas(FigureCanvas):
         b = self.model_integration.borne_sup
         n = self.model_integration.nb_boites
 
-        x = np.linspace(a, b, n + 1)  # evaluation
-        y = f(x)
+        x = np.linspace(a, b, n + 1)
+        y = f(x)                     # evaluation de chaque ieme point avec pas égal à (borne sup - borne inf)/nb boites(+1 pour gèrer droite ou gauche)
 
         if self.model_integration.is_gauche:
             side = -1
@@ -42,7 +42,7 @@ class MPLCanvas(FigureCanvas):
             y_toside = y[:-1]
         else:
             side = 1
-            x_toside = x[1:]  # right endpoints(tous les points en vrai sauf le premier)
+            x_toside = x[1:]  # right endpoints(tous les points sauf le premier)
             y_toside = y[1:]
 
         # rectangles avec un bar graph
@@ -50,6 +50,7 @@ class MPLCanvas(FigureCanvas):
         # pour dessiner ses bar graphs, donc le "bar graph" ici est plus un dessin de n rectangles allant de
         # zero a f(x)
         #ça compute plus rapidement que de faire les "artists" a la main
+        #puis c'est franchement plus élégant
         plt.bar(x_toside, y_toside, width=-side * (b - a) / n, alpha=1, align='edge', facecolor="None",
                 edgecolor="orange", linewidth=1.5)
 

@@ -47,7 +47,7 @@ class ViewListFonction(QDockWidget):
 
         self.fonctionLineEdit.textEdited.connect(self.update_button_state)
 
-        self.enregistrerPushButton.clicked.connect(self.model.export)
+        self.enregistrerPushButton.clicked.connect(self.model.enregistrer)
 
         self.fonctionsListView.clicked.connect(self.update_button_state)
 
@@ -66,7 +66,7 @@ class ViewListFonction(QDockWidget):
         elif (event.key() == Qt.Key.Key_Delete or event.key() == Qt.Key.Key_Backspace) and self.supprimerPushButton.isEnabled():
             self.removeFonction()
         elif event.modifiers() == Qt.KeyboardModifier.ControlModifier and event.key() == Qt.Key.Key_S and self.enregistrerPushButton.isEnabled():
-            self.model.export()
+            self.model.enregistrer()
         else:
             pass
 
@@ -76,6 +76,7 @@ class ViewListFonction(QDockWidget):
         self.supprimerPushButton.setEnabled(self.fonctionsListView.selectionModel().hasSelection())
 
         self.enregistrerPushButton.setEnabled(self.model.rowCount()>0)
+        #eviter de sauvegarder une liste vide permet l'utilisation plus simple à la prochaine ouverture du programme(pas besoin d'ajouter une fonction avant de commencer à dessiner)
 
     def addFonction(self):
         x = sp.symbols('x')

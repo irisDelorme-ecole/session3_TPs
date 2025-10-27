@@ -1,18 +1,16 @@
 import io
 from functools import lru_cache
-
 from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, pyqtSignal, QSize
 from PyQt6.QtGui import QImage, QPixmap, QIcon, QPainter
 from matplotlib.backends.backend_template import FigureCanvas
 from matplotlib.figure import Figure
-
 from ModelIntegration import IntegrationModel
 from PyQt6.QtWidgets import QMessageBox, QStyleOptionViewItem, QApplication, QStyle, QStyledItemDelegate
 import json
 
 
 # -------------------------
-# Renderer (matplotlib -> QPixmap)
+# Renderer (matplotlib -> QPixmap) (par github copilot)
 # -------------------------
 def latex_to_qpixmap(latex: str, fontsize: int = 18, dpi: int = 200) -> QPixmap:
     """
@@ -20,9 +18,9 @@ def latex_to_qpixmap(latex: str, fontsize: int = 18, dpi: int = 200) -> QPixmap:
     """
     fig = Figure(figsize=(0.01, 0.01))
     fig.patch.set_alpha(0.0)
-    canvas = FigureCanvas(fig)
+    canvas = FigureCanvas(fig) #créer widget matplotlib avec patch vide
 
-    # Put formula in math mode
+    # écrire la fonction avec les fonctionnalités LaTeX natives de mpl
     fig.text(0, 0, f"${latex}$", fontsize=fontsize)
     canvas.draw()
 
@@ -34,22 +32,22 @@ def latex_to_qpixmap(latex: str, fontsize: int = 18, dpi: int = 200) -> QPixmap:
         transparent=True,
         bbox_inches="tight",
         pad_inches=0.1,
-    )
+    ) #sauvegarde dans le BytesIO() qui permet de garder des données binaires et les consulter comme si elles étaient dans un fichier.
     buf.seek(0)
     img_data = buf.read()
     qimg = QImage.fromData(img_data)
-    pix = QPixmap.fromImage(qimg)
+    pix = QPixmap.fromImage(qimg) #tranformer en widget qpixmap : "off-screen image representation that can be used as a paint device" selon doc.
+    #bref: image utilisable comme painter, par exemple pour un QStyledItemDelegate
     return pix
 
 
 # Cache rendered pixmaps (keyed by formula and fontsize/dpi)
 @lru_cache(maxsize=512)
 def cached_latex_to_qpixmap(latex: str, fontsize: int = 18, dpi: int = 200) -> QPixmap:
-    return latex_to_qpixmap(latex, fontsize=fontsize, dpi=dpi)
+    return latex_to_qpixmap(latex, fontsize=fontsize, dpi=dpi) #aller chercher cache et ensuite envoyer à latex_to_qpixmap
 
 
 class ModelListFonctions(QAbstractListModel):
-    updatedSignal = pyqtSignal(bool)
 
     def __init__(self):
 
@@ -58,13 +56,13 @@ class ModelListFonctions(QAbstractListModel):
         self.__fonctions = []
         self.from_dict()
 
-    def to_dict(self):
+    def to_dict(self): #serialiseur
         dict = {}
         for i in range(len(self.__fonctions)):
             dict[str(i)] = self.__fonctions[i].__str__()
         return dict
 
-    def from_dict(self):
+    def from_dict(self): #déserialiseur
         with open('data\listefonctions.json') as json_file:
             data = json.load(json_file)
         if data.__len__() == 0:
@@ -73,7 +71,7 @@ class ModelListFonctions(QAbstractListModel):
             for i in range(data.__len__()):
                 self.addItem(IntegrationModel(data[str(i)]))
 
-    def export(self):
+    def enregistrer(self):
         with open("data\listeFonctions.json", 'w') as file:
             json.dump(self.to_dict(), file)
             file.close()
@@ -85,12 +83,12 @@ class ModelListFonctions(QAbstractListModel):
             return None
         fonction = self.__fonctions[index.row()]
         if role == Qt.ItemDataRole.DisplayRole:
-            # Return empty so default drawing doesn't show raw text.
+            # rien dans le display role pour pas avoir de str à l'affichage
             return ""
         if role == Qt.ItemDataRole.UserRole:
             return fonction
         if role == Qt.ItemDataRole.DecorationRole:
-            # Provide a tiny icon to keep compatibility; delegate will handle full render
+            # mini icone pour compatibilité, mais le delegate doit quand-même faire sa job.
             pix = cached_latex_to_qpixmap(fonction.latex(), fontsize=12, dpi=150)
             if not pix.isNull():
                 return QIcon(pix)
@@ -117,7 +115,7 @@ class ModelListFonctions(QAbstractListModel):
 
 
 # -------------------------
-# Delegate (paints pixmaps on demand)
+# Delegate (paints pixmaps on demand) (de github copilot)
 # -------------------------
 class LatexDelegate(QStyledItemDelegate):
     """
@@ -176,7 +174,7 @@ class LatexDelegate(QStyledItemDelegate):
 
         painter.restore()
 
-    def sizeHint(self, option, index) -> QSize:
+    def sizeHint(self, option, index) -> QSize: #gestion du format(retourne un "sizeHint" utilisé par autres méthodes pour choisir leurs formats.)
         formula = index.data(Qt.ItemDataRole.UserRole)
         if formula:
             orig = cached_latex_to_qpixmap(formula.__str__(), fontsize=self.pixmap_fontsize, dpi=200)

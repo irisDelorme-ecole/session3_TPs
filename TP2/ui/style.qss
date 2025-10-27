@@ -17,6 +17,10 @@ QLineEdit { background-color : #99afd7}
 
 QComboBox { background-color: #99afd7}
 
+QComboBox QAbstractItemView {
+        background-color: #ccdbee;
+    }
+
 QPushButton {
     background-color: #99afd7;
     border-style: outset;
