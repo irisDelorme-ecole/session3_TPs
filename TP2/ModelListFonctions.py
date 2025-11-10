@@ -49,6 +49,7 @@ def cached_latex_to_qpixmap(latex: str, fontsize: int = 18, dpi: int = 200) -> Q
 
 
 class ModelListFonctions(QAbstractListModel):
+
     updatedSignal = pyqtSignal(bool)
 
     def __init__(self):
@@ -88,6 +89,7 @@ class ModelListFonctions(QAbstractListModel):
             # Return empty so default drawing doesn't show raw text.
             return ""
         if role == Qt.ItemDataRole.UserRole:
+            self.updatedSignal.emit(True)
             return fonction
         if role == Qt.ItemDataRole.DecorationRole:
             # Provide a tiny icon to keep compatibility; delegate will handle full render

@@ -35,6 +35,8 @@ class View(QMainWindow):
         # setup model pour liste et combobox
         self.listeModel = ModelListFonctions()
 
+        self.listeModel.updatedSignal
+
         self.fonctionComboBox.setModel(self.listeModel)
 
 
