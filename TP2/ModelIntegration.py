@@ -91,14 +91,10 @@ class IntegrationModel():
     def latex(self):
         return str(sp.latex(self.fonction))
 
-    def __eq__(self, other):
+    def __eq__(self, other):#pour pouvoir trouver une fonction dans le modelListFonction
         if other is None:
             return False
         elif other.__class__.__name__ != self.__class__.__name__:
             return False
         else:
             return self.__str__() == other.__str__()
-
-# test = IntegrationModel()
-# test.fonction = "x**3"
-# print(test.sum())
