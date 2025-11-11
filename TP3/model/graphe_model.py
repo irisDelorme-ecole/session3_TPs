@@ -23,6 +23,8 @@ class GrapheModel(QObject):
     # le poids max d'une arete pour la generation
     __poids_max = 10
 
+    __selected_node = []
+
     # signal qui envoie le graphe complet
     grapheChanged = pyqtSignal(dict)
 
@@ -67,24 +69,34 @@ class GrapheModel(QObject):
         self.grapheChanged.emit(self._pos)
 
     def get_number_nodes(self):
-        print(len(self._pos))
         return len(self._pos)
 
 
+    @property
+    def selected_node(self):
+        return self.__selected_node
 
 
     def get_node_at(self, position):
-        print(self._pos)
+        has_node = False
         for pos in self._pos.values():
 
             if ((position[0]-pos[0])**2 + (position[1]-pos[1])**2)**(1/2) <= 0.06:
-                print(True)
-                return True
+                print(pos)
 
-        self._pos[f'{self.get_number_nodes()}'] = position
-        print(self._pos)
-        self._graphe.add_node(f"{self.get_number_nodes()-1}", pos=(position[0], position[1]))
-        self.grapheChanged.emit(self._pos)
+                self.__selected_node = [key for key, val in self._pos.items() if list(self._pos[key]) == list(pos)]
+
+                self.__selected_node.append(pos)
+
+                has_node = True
+                self.grapheChanged.emit(self._pos)
+
+                break
+        if not has_node:
+            self._pos[f'{self.get_number_nodes()}'] = position
+            self._graphe.add_node(f"{self.get_number_nodes()-1}", pos=(position[0], position[1]))
+            self.__selected_node = [f"{self.get_number_nodes()-1}", [position[0], position[1]]]
+            self.grapheChanged.emit(self._pos)
 
 
     def delete_graph(self):

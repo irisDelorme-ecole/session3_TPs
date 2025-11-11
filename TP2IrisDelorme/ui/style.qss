@@ -1,0 +1,55 @@
+QLabel { color : #233c67 }
+
+
+QGroupBox::QRadioButton {
+background-color : #233c67}
+
+QMainWindow { background-color : #ccdbee
+}
+
+QMenuBar { color : #233c67}
+
+QMenu { background-color : #6888be}
+
+QLineEdit { background-color : #99afd7}
+
+
+
+QComboBox { background-color: #99afd7}
+
+QComboBox QAbstractItemView {
+        background-color: #ccdbee;
+    }
+
+QPushButton {
+    background-color: #99afd7;
+    border-style: outset;
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: beige;
+    font: bold 14px;
+    padding: 6px;
+    color : #233c67
+}
+QPushButton:pressed {
+    background-color: #ccdbee;
+    border-style: inset;
+}
+
+QPushButton:disabled {
+    background-color: #ccdbee;
+        border-style: inset;
+    color : #6888be
+}
+
+QLineEdit {
+        color : #233c67
+        background-color : #ccdbee
+}
+
+QDockWidget { color: #99afd7}
+
+
+
+
+

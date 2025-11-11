@@ -20,9 +20,9 @@ class MainController :
         # Connecter le bouton de creation de graphe
         self.__view.createButton.clicked.connect(self.generate_graph)
         self.__view.deleteButton.clicked.connect(self.delete_graph)
-        self.__canvas.signal.connect(self.node_clicked)
+        self.__canvas.signal.connect(self.canvas_clicked)
 
-    def node_clicked(self,pos):
+    def canvas_clicked(self,pos):
         self.__model.get_node_at(pos)
 
     def post_init(self):
@@ -31,6 +31,9 @@ class MainController :
 
     def graphe(self):
         return self.__model.graphe
+
+    def selected(self):
+        return self.__model.selected_node
 
     def generate_graph(self, pos):
         self.__model.generate_graph()

@@ -50,9 +50,23 @@ class GraphCanvas(FigureCanvasQTAgg):
     def __draw_graphe(self):
         if self.__controller.graphe() is None:
             return
+        graphe = self.__controller.graphe().copy()
         try :
-            # Dessiner le graphe dans l'axe du canvas
-            nx.draw(self.__controller.graphe(), self._pos , with_labels=True, node_color='skyblue', node_size=800)
+            if self.__controller.selected():
+                graphe_sel = graphe.copy()
+                graphe.remove_node(self.__controller.selected()[0])
+
+                pos_main = {name : pos for name, pos in self._pos.items() if name != self.__controller.selected()[0]}
+
+                nx.draw(graphe, pos_main,with_labels=True, node_color='skyblue', node_size=800)
+                print("am drawing")
+                graphe_sel.remove_nodes_from(graphe)
+
+                nx.draw(graphe_sel, {self.__controller.selected()[0]:self.__controller.selected()[1]}, with_labels=True, node_color='red', node_size=800)
+            else:
+                # Dessiner le graphe dans l'axe du canvas
+                nx.draw(self.__controller.graphe(), self._pos, with_labels=True, node_color='skyblue', node_size=800)
+            nx.draw_networkx_edges(self.__controller.graphe(),self._pos)
             labels = nx.get_edge_attributes(self.__controller.graphe(), "weight")
             nx.draw_networkx_edge_labels(self.__controller.graphe(), self._pos , edge_labels=labels)
         except NetworkXError as nxe :
@@ -63,7 +77,6 @@ class GraphCanvas(FigureCanvasQTAgg):
     def mousePressEvent(self, event):
         try:
             pos = self.__convert_pos(event)
-            print(pos)
             self.signal.emit(pos)
 
         except Exception as e:
