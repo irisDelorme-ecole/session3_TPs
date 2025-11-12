@@ -1,6 +1,7 @@
 import networkx as nx
 import numpy as np
 from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.uic.properties import QtCore
 
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
@@ -17,6 +18,8 @@ class GraphCanvas(FigureCanvasQTAgg):
     _pos=None
 
     signal = pyqtSignal(np.ndarray)
+    signal_delete = pyqtSignal(str)
+    signal_create_edge = pyqtSignal(np.ndarray, np.ndarray)
 
     def __init__(self):
         # Crée une figure matplotlib
@@ -28,6 +31,7 @@ class GraphCanvas(FigureCanvasQTAgg):
         #Permet de faire fonctionner l'ecoute des touches dans un canvas
         self.setFocus()
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.__dragging = False
 
     def set_controller(self,controller):
         self.__controller=controller
@@ -77,10 +81,30 @@ class GraphCanvas(FigureCanvasQTAgg):
     def mousePressEvent(self, event):
         try:
             pos = self.__convert_pos(event)
-            self.signal.emit(pos)
+
+            if event.button() == Qt.MouseButton.RightButton:
+                self.__dragging = True
+                self.__drag_start_pos = pos
+            else:
+                self.__dragging = False
+                self.signal.emit(pos)
+
 
         except Exception as e:
             print(e)
+
+    def mouseReleaseEvent(self, event):
+        if self.__dragging:
+            pos_end = self.__convert_pos(event)
+            self.signal_create_edge.emit(self.__drag_start_pos, pos_end)
+            self.signal.emit(pos_end)
+
+
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key.Key_Delete:
+            self.signal_delete.emit("del pressed")
+
 
 
     def on_graph_changed(self,position):

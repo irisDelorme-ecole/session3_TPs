@@ -9,15 +9,15 @@ from networkx import Graph
 
 
 class GrapheModel(QObject):
-    #Le graphe 0 à afficher
-    _graphe:Graph = nx.Graph()
-    #_pos contient le layout, soit le mapping noeud -> position pour l'Affichage
-    _pos=None
+    # Le graphe 0 à afficher
+    _graphe: Graph = nx.Graph()
+    # _pos contient le layout, soit le mapping noeud -> position pour l'Affichage
+    _pos = None
 
     # probabilité qu'une arête existe entre deux nœuds pour la generation
-    __proba=0.5
+    __proba = 0.5
     # Le nombre de noeuds par défaut pour la generation
-    __default_graphe_order =10
+    __default_graphe_order = 10
     # le poids min d'une arete pour la generation
     __poids_min = 1
     # le poids max d'une arete pour la generation
@@ -32,6 +32,17 @@ class GrapheModel(QObject):
         super().__init__()
         self._pos = nx.spring_layout(self._graphe, seed=42)
 
+    def create_edge(self, pos1, pos2):
+        node1, is_node_already = self.get_node_at(pos1)
+        node2, is_node_already2 = self.get_node_at(pos2)
+        if is_node_already and is_node_already2:
+            if self._graphe.has_edge(node1[0], node2[0]):
+                self._graphe[node1[0]][node2[0]]['weight'] += 1
+            else:
+                self._graphe.add_edge(node1[0], node2[0], weight=1)
+
+            self.grapheChanged.emit(self._pos)
+
     def graphe_order(self):
         return self._graphe.number_of_nodes()
 
@@ -41,7 +52,7 @@ class GrapheModel(QObject):
 
     @default_graphe_order.setter
     def default_graphe_order(self, value):
-        self.__default_graphe_order=value
+        self.__default_graphe_order = value
 
     @property
     def graphe(self):
@@ -51,10 +62,11 @@ class GrapheModel(QObject):
     def pos(self):
         return self._pos
 
-    def edge_weight(self,edge):
-        return  self._graphe[edge[0]][edge[1]]['weight']
+    def edge_weight(self, edge):
+        return self._graphe[edge[0]][edge[1]]['weight']
 
     def generate_graph(self):
+        self.delete_graph()
         # Générer un graphe aléatoire non orienté avec une probabilité d'Arete donnée
         self._graphe = nx.gnp_random_graph(self.default_graphe_order, self.__proba, directed=False)
 
@@ -63,7 +75,7 @@ class GrapheModel(QObject):
             self._graphe[u][v]['weight'] = random.randint(self.__poids_min, self.__poids_max)
 
         # stocke le nouveau layout
-        self._pos  = nx.spring_layout(self._graphe, seed=42)
+        self._pos = nx.spring_layout(self._graphe, seed=42)
 
         # Notif des vues
         self.grapheChanged.emit(self._pos)
@@ -71,33 +83,47 @@ class GrapheModel(QObject):
     def get_number_nodes(self):
         return len(self._pos)
 
-
     @property
     def selected_node(self):
         return self.__selected_node
 
+    @selected_node.setter
+    def selected_node(self, value):
+        self.__selected_node = value
+        print("made to setter")
+        if not self._graphe.has_node(value[0]):
+            self.add_node()
+        self.grapheChanged.emit(self._pos)
+
+    def delete_node(self):
+        if self.__selected_node:
+            self._graphe.remove_node(self.__selected_node[0])
+            del self._pos[self.__selected_node[0]]
+            self.__selected_node = []
+            self.grapheChanged.emit(self._pos)
 
     def get_node_at(self, position):
         has_node = False
         for pos in self._pos.values():
 
-            if ((position[0]-pos[0])**2 + (position[1]-pos[1])**2)**(1/2) <= 0.06:
+            if ((position[0] - pos[0]) ** 2 + (position[1] - pos[1]) ** 2) ** (1 / 2) <= 0.06:
                 print(pos)
 
-                self.__selected_node = [key for key, val in self._pos.items() if list(self._pos[key]) == list(pos)]
+                selected_node = [key for key, val in self._pos.items() if list(self._pos[key]) == list(pos)]
 
-                self.__selected_node.append(pos)
+                selected_node.append(pos)
 
                 has_node = True
                 self.grapheChanged.emit(self._pos)
 
-                break
-        if not has_node:
-            self._pos[f'{self.get_number_nodes()}'] = position
-            self._graphe.add_node(f"{self.get_number_nodes()-1}", pos=(position[0], position[1]))
-            self.__selected_node = [f"{self.get_number_nodes()-1}", [position[0], position[1]]]
-            self.grapheChanged.emit(self._pos)
+                return selected_node, has_node
 
+        # self._pos[f'{self.get_number_nodes()}'] = position
+        # self._graphe.add_node(f"{self.get_number_nodes()-1}", pos=(position[0], position[1]))
+        return [f"{self.get_number_nodes() - 1}", [position[0], position[1]]], has_node
+
+    def add_node(self):
+        self._graphe.add_node(self.__selected_node[0], pos=self.__selected_node[1])
 
     def delete_graph(self):
         # Effacer les references au graphe
@@ -105,6 +131,7 @@ class GrapheModel(QObject):
         # stocke le nouveau layout
         self._pos = nx.spring_layout(self._graphe, seed=42)
 
-        # Notif des vues
-        self.grapheChanged.emit(self._pos )
+        self.__selected_node = []
 
+        # Notif des vues
+        self.grapheChanged.emit(self._pos)

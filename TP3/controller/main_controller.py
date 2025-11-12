@@ -21,9 +21,17 @@ class MainController :
         self.__view.createButton.clicked.connect(self.generate_graph)
         self.__view.deleteButton.clicked.connect(self.delete_graph)
         self.__canvas.signal.connect(self.canvas_clicked)
+        self.__canvas.signal_delete.connect(self.delete_node)
+        self.__canvas.signal_create_edge.connect(self.create_edge)
+
+    def create_edge(self,pos1, pos2):
+        self.__model.create_edge(pos1, pos2)
+
+    def delete_node(self):
+        self.__model.delete_node()
 
     def canvas_clicked(self,pos):
-        self.__model.get_node_at(pos)
+        self.__model.selected_node, _ = self.__model.get_node_at(pos)
 
     def post_init(self):
         self.__model.grapheChanged.connect(self.__canvas.on_graph_changed)
