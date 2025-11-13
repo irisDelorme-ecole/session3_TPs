@@ -77,6 +77,7 @@ class GrapheModel(QObject):
         # stocke le nouveau layout
         self._pos = nx.spring_layout(self._graphe, seed=42)
 
+
         # Notif des vues
         self.grapheChanged.emit(self._pos)
 
@@ -90,9 +91,13 @@ class GrapheModel(QObject):
     @selected_node.setter
     def selected_node(self, value):
         self.__selected_node = value
-        print("made to setter")
-        if not self._graphe.has_node(value[0]):
-            self.add_node()
+
+        if not self._graphe.has_node(int(value[0])):
+            print("made to setter")
+            self._graphe.add_node(int(value[0]), pos=value[1])
+            self._pos[int(value[0])] = value[1]
+
+
         self.grapheChanged.emit(self._pos)
 
     def delete_node(self):
@@ -101,6 +106,11 @@ class GrapheModel(QObject):
             del self._pos[self.__selected_node[0]]
             self.__selected_node = []
             self.grapheChanged.emit(self._pos)
+
+    #def logique_dist_edge(self):
+        #TODO: make work
+
+
 
     def get_node_at(self, position):
         has_node = False
@@ -117,13 +127,38 @@ class GrapheModel(QObject):
                 self.grapheChanged.emit(self._pos)
 
                 return selected_node, has_node
+       
+
+
+        # for edge in self._graphe.edges:
+        #     x_click = position[0]
+        #     y_click = position[1]
+        #     x_pt1 = self._pos[edge[0]][0]
+        #     y_pt1 = self._pos[edge[0]][1]
+        #     x_pt2 = self._pos[edge[1]][0]
+        #     y_pt2 = self._pos[edge[1]][1]
+        #
+        #
+        #     x_pc = x_pt1-x_click
+        #     y_pc = y_pt1-y_click
+        #
+        #
+        #     x_edge   =  x_pt1-x_pt2
+        #     y_edge  =  y_pt1-y_pt2
+        #
+        #     x_dist = x_pc - ((x_pc*x_edge + y_pc*y_edge)/(x_edge**2 + y_edge**2) * x_edge)
+        #     y_dist =  y_pc - ((x_pc*x_edge + y_pc*y_edge)/(x_edge**2 + y_edge**2) * y_edge)
+        #
+        #
+        #     if np.sqrt((x_dist**2) + (y_dist**2)) <= 0.6:
+        #
+        #         return edge
 
         # self._pos[f'{self.get_number_nodes()}'] = position
         # self._graphe.add_node(f"{self.get_number_nodes()-1}", pos=(position[0], position[1]))
-        return [f"{self.get_number_nodes() - 1}", [position[0], position[1]]], has_node
+        return [f"{self.get_number_nodes()}", position], has_node
 
-    def add_node(self):
-        self._graphe.add_node(self.__selected_node[0], pos=self.__selected_node[1])
+
 
     def delete_graph(self):
         # Effacer les references au graphe

@@ -32,6 +32,7 @@ class MainController :
 
     def canvas_clicked(self,pos):
         self.__model.selected_node, _ = self.__model.get_node_at(pos)
+        print(self.__model.pos)
 
     def post_init(self):
         self.__model.grapheChanged.connect(self.__canvas.on_graph_changed)
