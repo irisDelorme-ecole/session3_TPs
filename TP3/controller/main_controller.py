@@ -31,8 +31,15 @@ class MainController :
         self.__model.delete_node()
 
     def canvas_clicked(self,pos):
-        self.__model.get_node_at(pos)
-        print(self.__model.pos)
+        possible_node = self.__model.get_node_at(pos)
+        possible_edge = self.__model.get_edge_at(pos)
+        if self.__model.graphe.has_node(possible_node):
+            self.__model.selected_node = possible_node #priority one: s'il y a une node
+        elif possible_edge is not None:
+
+            self.__model.selected_edge = possible_edge #priority 2: s'il y  a une edge
+        else:
+            self.__model.selected_node = possible_node #sinon, add node
 
     def post_init(self):
         self.__model.grapheChanged.connect(self.__canvas.on_graph_changed)
@@ -41,8 +48,11 @@ class MainController :
     def graphe(self):
         return self.__model.graphe
 
-    def selected(self):
+    def selected_node(self):
         return self.__model.selected_node
+
+    def selected_edge(self):
+        return self.__model.selected_edge
 
     def generate_graph(self, pos):
         self.__model.generate_graph()

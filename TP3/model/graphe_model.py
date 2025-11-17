@@ -25,6 +25,8 @@ class GrapheModel(QObject):
 
     __selected_node = []
 
+    __selected_edge = []
+
     # signal qui envoie le graphe complet
     grapheChanged = pyqtSignal(dict)
 
@@ -34,9 +36,9 @@ class GrapheModel(QObject):
 
     def create_edge(self, pos1, pos2):
         #TODO : fix avec nouvelle structure
-        node1, is_node_already = self.get_node_at(pos1)
-        node2, is_node_already2 = self.get_node_at(pos2)
-        if is_node_already and is_node_already2:
+        node1 =self.get_node_at(pos1)
+        node2 =self.get_node_at(pos2)
+        if self._graphe.has_node(node1[0]) and self._graphe.has_node(node2[0]):
             if self._graphe.has_edge(node1[0], node2[0]):
                 self._graphe[node1[0]][node2[0]]['weight'] += 1
             else:
@@ -91,7 +93,9 @@ class GrapheModel(QObject):
 
     @selected_edge.setter
     def selected_edge(self, value):
-        pass
+        self.__selected_edge = [value[0], value[1]]
+        self.__selected_node = []
+        self.grapheChanged.emit(self._pos)
 
     @property
     def selected_node(self):
@@ -105,7 +109,7 @@ class GrapheModel(QObject):
             self._graphe.add_node(int(value[0]), pos=value[1])
             self._pos[int(value[0])] = value[1]
 
-
+        self.__selected_edge = []
         self.grapheChanged.emit(self._pos)
 
     def delete_node(self):
@@ -143,7 +147,7 @@ class GrapheModel(QObject):
 
 
     def get_node_at(self, position):
-        has_node_or_edge = False
+
         for pos in self._pos.values():
 
             if ((position[0] - pos[0]) ** 2 + (position[1] - pos[1]) ** 2) ** (1 / 2) <= 0.06:
@@ -151,24 +155,18 @@ class GrapheModel(QObject):
 
                 selected_node = [key for key, val in self._pos.items() if list(self._pos[key]) == list(pos)]
 
+
                 selected_node.append(pos)
 
+                return selected_node
+        return [self.get_number_nodes() , position]
 
-                self.grapheChanged.emit(self._pos)
 
-                self.selected_node = selected_node
-                has_node_or_edge = True
-        if not has_node_or_edge:
-
-            for edge in self._graphe.edges:
-                if self.dist_edge(edge, position) <= 0.004:
-                    self.grapheChanged.emit(self._pos)
-                    self.__selected_edge = edge
-                    has_node_or_edge = True
-
-        if not has_node_or_edge:
-            self.selected_node =[f"{self.get_number_nodes()}", position]
-
+    def get_edge_at(self, position):
+        for edge in self._graphe.edges:
+            if self.dist_edge(edge, position) <= 0.004:
+                return edge
+        return None
 
 
     def delete_graph(self):
