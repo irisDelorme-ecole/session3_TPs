@@ -31,7 +31,7 @@ class MainController :
         self.__model.delete_node()
 
     def canvas_clicked(self,pos):
-        self.__model.selected_node, _ = self.__model.get_node_at(pos)
+        self.__model.get_node_at(pos)
         print(self.__model.pos)
 
     def post_init(self):

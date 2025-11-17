@@ -33,6 +33,7 @@ class GrapheModel(QObject):
         self._pos = nx.spring_layout(self._graphe, seed=42)
 
     def create_edge(self, pos1, pos2):
+        #TODO : fix avec nouvelle structure
         node1, is_node_already = self.get_node_at(pos1)
         node2, is_node_already2 = self.get_node_at(pos2)
         if is_node_already and is_node_already2:
@@ -85,6 +86,14 @@ class GrapheModel(QObject):
         return len(self._pos)
 
     @property
+    def selected_edge(self):
+        return self.__selected_edge
+
+    @selected_edge.setter
+    def selected_edge(self, value):
+        pass
+
+    @property
     def selected_node(self):
         return self.__selected_node
 
@@ -93,7 +102,6 @@ class GrapheModel(QObject):
         self.__selected_node = value
 
         if not self._graphe.has_node(int(value[0])):
-            print("made to setter")
             self._graphe.add_node(int(value[0]), pos=value[1])
             self._pos[int(value[0])] = value[1]
 
@@ -107,13 +115,35 @@ class GrapheModel(QObject):
             self.__selected_node = []
             self.grapheChanged.emit(self._pos)
 
-    #def logique_dist_edge(self):
+    def dist_edge(self, edge, position):
         #TODO: make work
+
+        x_click = position[0]
+        y_click = position[1]
+        x_pt1 = self._pos[edge[0]][0]
+        y_pt1 = self._pos[edge[0]][1]
+        x_pt2 = self._pos[edge[1]][0]
+        y_pt2 = self._pos[edge[1]][1]
+
+
+        x_pc = x_click - x_pt1
+        y_pc = y_click - y_pt1
+
+
+        x_edge   =  x_pt2 - x_pt1
+        y_edge  =  y_pt2 - y_pt1
+
+        x_dist = x_click - (x_pt1 + ((x_pc*x_edge + y_pc*y_edge)/(x_edge**2 + y_edge**2) * x_edge))
+        y_dist =  y_click - (y_pt1 + ((x_pc*x_edge + y_pc*y_edge)/(x_edge**2 + y_edge**2) * y_edge))
+        if (x_dist**2) + (y_dist**2)**(1/2) < 2:
+            print(round((x_dist**2) + (y_dist**2)**(1/2), 4), position, edge)
+        return round((x_dist**2) + (y_dist**2)**(1/2), 4)
+
 
 
 
     def get_node_at(self, position):
-        has_node = False
+        has_node_or_edge = False
         for pos in self._pos.values():
 
             if ((position[0] - pos[0]) ** 2 + (position[1] - pos[1]) ** 2) ** (1 / 2) <= 0.06:
@@ -123,40 +153,21 @@ class GrapheModel(QObject):
 
                 selected_node.append(pos)
 
-                has_node = True
+
                 self.grapheChanged.emit(self._pos)
 
-                return selected_node, has_node
-       
+                self.selected_node = selected_node
+                has_node_or_edge = True
+        if not has_node_or_edge:
 
+            for edge in self._graphe.edges:
+                if self.dist_edge(edge, position) <= 0.004:
+                    self.grapheChanged.emit(self._pos)
+                    self.__selected_edge = edge
+                    has_node_or_edge = True
 
-        # for edge in self._graphe.edges:
-        #     x_click = position[0]
-        #     y_click = position[1]
-        #     x_pt1 = self._pos[edge[0]][0]
-        #     y_pt1 = self._pos[edge[0]][1]
-        #     x_pt2 = self._pos[edge[1]][0]
-        #     y_pt2 = self._pos[edge[1]][1]
-        #
-        #
-        #     x_pc = x_pt1-x_click
-        #     y_pc = y_pt1-y_click
-        #
-        #
-        #     x_edge   =  x_pt1-x_pt2
-        #     y_edge  =  y_pt1-y_pt2
-        #
-        #     x_dist = x_pc - ((x_pc*x_edge + y_pc*y_edge)/(x_edge**2 + y_edge**2) * x_edge)
-        #     y_dist =  y_pc - ((x_pc*x_edge + y_pc*y_edge)/(x_edge**2 + y_edge**2) * y_edge)
-        #
-        #
-        #     if np.sqrt((x_dist**2) + (y_dist**2)) <= 0.6:
-        #
-        #         return edge
-
-        # self._pos[f'{self.get_number_nodes()}'] = position
-        # self._graphe.add_node(f"{self.get_number_nodes()-1}", pos=(position[0], position[1]))
-        return [f"{self.get_number_nodes()}", position], has_node
+        if not has_node_or_edge:
+            self.selected_node =[f"{self.get_number_nodes()}", position]
 
 
 
