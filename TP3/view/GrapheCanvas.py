@@ -21,6 +21,7 @@ class GraphCanvas(FigureCanvasQTAgg):
     signal = pyqtSignal(np.ndarray)
     signal_delete = pyqtSignal(str)
     signal_create_edge = pyqtSignal(np.ndarray, np.ndarray)
+    signal_move = pyqtSignal(np.ndarray, np.ndarray)
 
     def __init__(self):
         # Crée une figure matplotlib
@@ -107,21 +108,26 @@ class GraphCanvas(FigureCanvasQTAgg):
 
             if event.button() == Qt.MouseButton.RightButton:
                 # TODO: make so i cant just drag from nowhere
-                self.__dragging = True
+                self.__dragging_right = True
                 self.__drag_start_pos = pos
             else:
-                self.__dragging = False
-                self.signal.emit(pos)
+                self.__dragging_right = False
+                self.__drag_start_pos = pos
+
 
 
         except Exception as e:
             print(e)
 
     def mouseReleaseEvent(self, event):
-        if self.__dragging:
+        pos_end = self.__convert_pos(event)
+        if self.__dragging_right:
             pos_end = self.__convert_pos(event)
             self.signal_create_edge.emit(self.__drag_start_pos, pos_end)
-            self.signal.emit(pos_end)
+        elif ((self.__drag_start_pos[0]-pos_end[0])**2 + (self.__drag_start_pos[1]-pos_end[1])**2)**(1/2) > 0.06:
+            self.signal_move.emit(self.__drag_start_pos, pos_end)
+        else:
+            self.signal.emit(self.__drag_start_pos)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key.Key_Delete:

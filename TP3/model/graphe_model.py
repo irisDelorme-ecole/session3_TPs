@@ -35,17 +35,24 @@ class GrapheModel(QObject):
         self._pos = nx.spring_layout(self._graphe, seed=42)
 
     def create_edge(self, pos1, pos2):
-        #TODO : fix avec nouvelle structure
-        node1 =self.get_node_at(pos1)
-        node2 =self.get_node_at(pos2)
+        # TODO : fix avec nouvelle structure
+        node1 = self.get_node_at(pos1)
+        node2 = self.get_node_at(pos2)
         if self._graphe.has_node(node1[0]) and self._graphe.has_node(node2[0]):
             if self._graphe.has_edge(node1[0], node2[0]):
                 self._graphe[node1[0]][node2[0]]['weight'] += 1
+                self.__selected_edge = [node1[0], node2[0]]
             else:
                 self._graphe.add_edge(node1[0], node2[0], weight=1)
-
+            self.__selected_edge = [node1[0], node2[0]]
+            self.__selected_node = []
             self.grapheChanged.emit(self._pos)
-        return [node1[0], node2[0]]
+
+    def move_node(self, node, pos):
+        self._pos[node] = pos
+        self.__selected_node = [node, pos]
+        self.__selected_edge = []
+        self.grapheChanged.emit(self._pos)
 
     def graphe_order(self):
         return self._graphe.number_of_nodes()
@@ -81,7 +88,6 @@ class GrapheModel(QObject):
         # stocke le nouveau layout
         self._pos = nx.spring_layout(self._graphe, seed=42)
 
-
         # Notif des vues
         self.grapheChanged.emit(self._pos)
 
@@ -114,14 +120,20 @@ class GrapheModel(QObject):
         self.grapheChanged.emit(self._pos)
 
     def delete_node(self):
-        if self.__selected_node:
-            self._graphe.remove_node(self.__selected_node[0])
-            del self._pos[self.__selected_node[0]]
-            self.__selected_node = []
-            self.grapheChanged.emit(self._pos)
+        print(self.__selected_node)
+        self._graphe.remove_node(self.__selected_node[0])
+        del self._pos[self.__selected_node[0]]
+        self.__selected_node = []
+        self.grapheChanged.emit(self._pos)
+
+    def delete_edge(self):
+
+        self._graphe.remove_edge(self.__selected_edge[0], self.__selected_edge[1])
+        self.__selected_edge = []
+        self.grapheChanged.emit(self._pos)
 
     def dist_edge(self, edge, position):
-        #TODO: make work
+        # TODO: make work
 
         x_click = position[0]
         y_click = position[1]
@@ -130,45 +142,37 @@ class GrapheModel(QObject):
         x_pt2 = self._pos[edge[1]][0]
         y_pt2 = self._pos[edge[1]][1]
 
-
         x_pc = x_click - x_pt1
         y_pc = y_click - y_pt1
 
+        x_edge = x_pt2 - x_pt1
+        y_edge = y_pt2 - y_pt1
 
-        x_edge   =  x_pt2 - x_pt1
-        y_edge  =  y_pt2 - y_pt1
-
-        x_dist = x_click - (x_pt1 + ((x_pc*x_edge + y_pc*y_edge)/(x_edge**2 + y_edge**2) * x_edge))
-        y_dist =  y_click - (y_pt1 + ((x_pc*x_edge + y_pc*y_edge)/(x_edge**2 + y_edge**2) * y_edge))
-        if (x_dist**2) + (y_dist**2)**(1/2) < 2:
-            print(round((x_dist**2) + (y_dist**2)**(1/2), 4), position, edge)
-        return round((x_dist**2) + (y_dist**2)**(1/2), 4)
-
-
-
+        x_dist = x_click - (x_pt1 + ((x_pc * x_edge + y_pc * y_edge) / (x_edge ** 2 + y_edge ** 2) * x_edge))
+        y_dist = y_click - (y_pt1 + ((x_pc * x_edge + y_pc * y_edge) / (x_edge ** 2 + y_edge ** 2) * y_edge))
+        if (x_dist ** 2) + (y_dist ** 2) ** (1 / 2) < 2:
+            print(round((x_dist ** 2) + (y_dist ** 2) ** (1 / 2), 4), position, edge)
+        return round((x_dist ** 2) + (y_dist ** 2) ** (1 / 2), 4)
 
     def get_node_at(self, position):
 
         for pos in self._pos.values():
 
-            if ((position[0] - pos[0]) ** 2 + (position[1] - pos[1]) ** 2) ** (1 / 2) <= 0.06:
+            if ((position[0] - pos[0]) ** 2 + (position[1] - pos[1]) ** 2) ** (1 / 2) <= 0.1:
                 print(pos)
 
                 selected_node = [key for key, val in self._pos.items() if list(self._pos[key]) == list(pos)]
 
-
                 selected_node.append(pos)
 
                 return selected_node
-        return [self.get_number_nodes() , position]
-
+        return [self.get_number_nodes(), position]
 
     def get_edge_at(self, position):
         for edge in self._graphe.edges:
-            if self.dist_edge(edge, position) <= 0.004:
+            if self.dist_edge(edge, position) <= 0.006:
                 return edge
         return None
-
 
     def delete_graph(self):
         # Effacer les references au graphe
@@ -177,6 +181,7 @@ class GrapheModel(QObject):
         self._pos = nx.spring_layout(self._graphe, seed=42)
 
         self.__selected_node = []
+        self.__selected_edge = []
 
         # Notif des vues
         self.grapheChanged.emit(self._pos)
