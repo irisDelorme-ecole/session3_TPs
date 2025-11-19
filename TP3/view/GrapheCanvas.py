@@ -77,16 +77,18 @@ class GraphCanvas(FigureCanvasQTAgg):
             elif self.__controller.selected_edge():
                 print('in draw edge')
                 graphe_sel = graphe.copy()
+                print(self.__controller.selected_edge()[0], self.__controller.selected_edge()[1])
                 graphe.remove_edge(self.__controller.selected_edge()[0], self.__controller.selected_edge()[1])
 
                 nx.draw(self.__controller.graphe(), self._pos, with_labels=True, node_color='skyblue', node_size=800)
 
-                labels = nx.get_edge_attributes(graphe, "weight")
+                labels = nx.get_edge_attributes(self.__controller.graphe(), "weight")
                 print('huh')
-                nx.draw_networkx_edges(graphe, self._pos,graphe.edges, label = labels)
+                nx.draw_networkx_edges(graphe, self._pos,graphe.edges)
                 graphe_sel.remove_edges_from(graphe.edges)
-                nx.draw_networkx_edges(graphe, self._pos, graphe_sel.edges, label = graphe_sel.get_edge_data(self.__controller.selected_edge()[0],self.__controller.selected_edge()[1], 'weight'), edge_color='red')
-
+                print(labels)
+                nx.draw_networkx_edges(graphe_sel, self._pos, graphe_sel.edges, edge_color='red')
+                nx.draw_networkx_edge_labels(self.__controller.graphe(), self._pos, labels)
                 nx.draw_networkx_nodes(graphe_sel, self._pos, node_color='skyblue', node_size=800)
             else:
                 # Dessiner le graphe dans l'axe du canvas

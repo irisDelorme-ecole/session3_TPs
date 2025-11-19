@@ -45,6 +45,7 @@ class GrapheModel(QObject):
                 self._graphe.add_edge(node1[0], node2[0], weight=1)
 
             self.grapheChanged.emit(self._pos)
+        return [node1[0], node2[0]]
 
     def graphe_order(self):
         return self._graphe.number_of_nodes()

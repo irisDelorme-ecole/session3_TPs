@@ -25,7 +25,8 @@ class MainController :
         self.__canvas.signal_create_edge.connect(self.create_edge)
 
     def create_edge(self,pos1, pos2):
-        self.__model.create_edge(pos1, pos2)
+
+        self.__model.selected_edge = self.__model.create_edge(pos1, pos2)
 
     def delete_node(self):
         self.__model.delete_node()
