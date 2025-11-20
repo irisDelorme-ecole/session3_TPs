@@ -1,6 +1,7 @@
 import time
 
 from PyQt6.QtCore import QThread, pyqtSignal
+from PyQt6.QtWidgets import QProgressBar
 
 from model.graphe_model import GrapheModel
 from view.GrapheCanvas import GraphCanvas
@@ -20,16 +21,32 @@ class MainController :
         # Connecter le bouton de creation de graphe
         self.__view.createButton.clicked.connect(self.generate_graph)
         self.__view.deleteButton.clicked.connect(self.delete_graph)
+        self.__view.debutSpinBox.valueChanged.connect(self.__model.set_debut)
+        self.__view.finSpinBox.valueChanged.connect(self.__model.set_fin)
+        self.__view.tracerPushButton.clicked.connect(self.lancer_thread)
+
         self.__canvas.signal.connect(self.canvas_clicked)
         self.__canvas.signal_delete.connect(self.delete_node_or_edge)
         self.__canvas.signal_create_edge.connect(self.create_edge)
         self.__canvas.signal_move.connect(self.move_node)
+
+    def lancer_thread(self):
+        progress = QProgressBar()
+
+        progress.setRange(0,0)
+        progress.show()
+
+        self.__model.lancer_thread()
+        time.sleep(1)
+        progress.hide()
 
     def move_node(self, pos_start, pos_end):
         possible_node = self.__model.get_node_at(pos_start)
         if self.__model.graphe.has_node(possible_node[0]):
             self.__model.move_node(possible_node[0], pos_end)
 
+    def chemin(self):
+        return self.__model.chemin
 
     def create_edge(self,pos1, pos2):
         self.__model.create_edge(pos1, pos2)

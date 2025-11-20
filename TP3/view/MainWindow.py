@@ -16,15 +16,22 @@ class MainWindow(QMainWindow):
     weightSpinBox:QSpinBox
     deleteEdgeButton:QPushButton
 
+    debutSpinBox:QSpinBox
+    finSpinBox:QSpinBox
+    tracerPushButton:QPushButton
+
 
 
     def __init__(self):
         super().__init__()
+
         loadUi("view/ui/main_window.ui", self)
         self.resize(1000,800)
         #self.draw_graphe()
         if TYPE_CHECKING:
             self.__controller: MainController | None = None
+
+        self.finSpinBox.setValue(9)
 
 
     def add_canvas(self, canvas):

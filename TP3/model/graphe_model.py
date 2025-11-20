@@ -4,8 +4,21 @@ import threading
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
-from PyQt6.QtCore import pyqtSignal, QObject
+from PyQt6.QtCore import pyqtSignal, QObject, QThread
 from networkx import Graph
+
+class PlusCourtChemin(QThread):
+    chemin = pyqtSignal(list)
+
+    def __init__(self, debut, fin, graphe:nx.Graph):
+        super().__init__()
+
+        self._debut = debut
+        self._fin = fin
+        self._graphe = graphe
+
+    def run(self):
+        self.chemin.emit(nx.shortest_path(self._graphe, self._debut, self._fin))
 
 
 class GrapheModel(QObject):
@@ -27,12 +40,40 @@ class GrapheModel(QObject):
 
     __selected_edge = []
 
+    __debut = 0
+
+    __fin = __default_graphe_order-1
+
+    __chemin = []
+
     # signal qui envoie le graphe complet
     grapheChanged = pyqtSignal(dict)
-
     def __init__(self):
         super().__init__()
         self._pos = nx.spring_layout(self._graphe, seed=42)
+
+    def lancer_thread(self):
+        self.thread = PlusCourtChemin( self.__debut, self.__fin,self._graphe)
+
+        self.thread.start()
+
+        self.thread.chemin.connect(self.set_chemin)
+
+    @property
+    def chemin(self):
+        return self.__chemin
+
+    def set_chemin(self, chemin):
+        self.__chemin = chemin
+        self.__selected_node = []
+        self.__selected_edge = []
+        self.grapheChanged.emit(self._pos)
+
+    def set_debut(self, debut):
+        self.__debut = debut
+
+    def set_fin(self, fin):
+        self.__fin = fin
 
     def create_edge(self, pos1, pos2):
         # TODO : fix avec nouvelle structure
@@ -102,6 +143,7 @@ class GrapheModel(QObject):
     def selected_edge(self, value):
         self.__selected_edge = [value[0], value[1]]
         self.__selected_node = []
+        self.__chemin = []
         self.grapheChanged.emit(self._pos)
 
     @property
@@ -117,6 +159,7 @@ class GrapheModel(QObject):
             self._pos[int(value[0])] = value[1]
 
         self.__selected_edge = []
+        self.__chemin = []
         self.grapheChanged.emit(self._pos)
 
     def delete_node(self):
@@ -150,8 +193,7 @@ class GrapheModel(QObject):
 
         x_dist = x_click - (x_pt1 + ((x_pc * x_edge + y_pc * y_edge) / (x_edge ** 2 + y_edge ** 2) * x_edge))
         y_dist = y_click - (y_pt1 + ((x_pc * x_edge + y_pc * y_edge) / (x_edge ** 2 + y_edge ** 2) * y_edge))
-        if (x_dist ** 2) + (y_dist ** 2) ** (1 / 2) < 2:
-            print(round((x_dist ** 2) + (y_dist ** 2) ** (1 / 2), 4), position, edge)
+
         return round((x_dist ** 2) + (y_dist ** 2) ** (1 / 2), 4)
 
     def get_node_at(self, position):
@@ -159,7 +201,7 @@ class GrapheModel(QObject):
         for pos in self._pos.values():
 
             if ((position[0] - pos[0]) ** 2 + (position[1] - pos[1]) ** 2) ** (1 / 2) <= 0.1:
-                print(pos)
+
 
                 selected_node = [key for key, val in self._pos.items() if list(self._pos[key]) == list(pos)]
 
@@ -170,7 +212,7 @@ class GrapheModel(QObject):
 
     def get_edge_at(self, position):
         for edge in self._graphe.edges:
-            if self.dist_edge(edge, position) <= 0.006:
+            if self.dist_edge(edge, position) <= 0.01:
                 return edge
         return None
 

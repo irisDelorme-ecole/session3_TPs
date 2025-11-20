@@ -56,46 +56,58 @@ class GraphCanvas(FigureCanvasQTAgg):
     def __draw_graphe(self):
         if self.__controller.graphe() is None:
             return
+        has_edge_selection = False
+        selection_colour = 'red'
+        pos_sel_node = {}
+        pos_main_node = self._pos
         graphe = self.__controller.graphe().copy()
+        graphe_sel = graphe.copy()
+        colour_map = {name: 'skyblue' for name, _ in self._pos.items()}
+        colour_map_edge = {name: 'black' for name in self.__controller.graphe().edges}
         try:
-            if self.__controller.selected_node():
-                graphe_sel = graphe.copy()
+            if self.__controller.chemin():
+                selection_colour = 'orange'
+                graphe.remove_nodes_from(self.__controller.chemin())
+
+                has_edge_selection = True
+
+                graphe_sel.remove_nodes_from(graphe)
+                graphe.remove_edges_from(graphe_sel.edges)
+
+                for edge in graphe_sel.edges:
+                    colour_map_edge[edge] = selection_colour
+
+                for node in graphe_sel.nodes:
+                    colour_map[node] = selection_colour
+
+
+            elif self.__controller.selected_node():
                 graphe.remove_node(int(self.__controller.selected_node()[0]))
 
-                pos_main = {name: pos for name, pos in self._pos.items() if
-                            name != int(self.__controller.selected_node()[0])}
+                colour_map[self.__controller.selected_node()[0]] = selection_colour
 
-                nx.draw(graphe, pos_main, with_labels=True, node_color='skyblue', node_size=800)
+                pos_sel_node = {int(self.__controller.selected_node()[0]): self.__controller.selected_node()[1]}
+
                 graphe_sel.remove_nodes_from(graphe)
 
-                nx.draw(graphe_sel, {int(self.__controller.selected_node()[0]): self.__controller.selected_node()[1]},
-                        with_labels=True, node_color='red', node_size=800)
 
-                # fill in with edges
-                nx.draw_networkx_edges(self.__controller.graphe(), self._pos)
-                labels = nx.get_edge_attributes(self.__controller.graphe(), "weight")
-                nx.draw_networkx_edge_labels(self.__controller.graphe(), self._pos, edge_labels=labels)
             elif self.__controller.selected_edge():
-                print('in draw edge')
-                graphe_sel = graphe.copy()
-                print(self.__controller.selected_edge()[0], self.__controller.selected_edge()[1])
+                has_edge_selection = True
                 graphe.remove_edge(self.__controller.selected_edge()[0], self.__controller.selected_edge()[1])
-
-                nx.draw(self.__controller.graphe(), self._pos, with_labels=True, node_color='skyblue', node_size=800)
-
-                labels = nx.get_edge_attributes(self.__controller.graphe(), "weight")
-                print('huh')
-                nx.draw_networkx_edges(graphe, self._pos,graphe.edges)
+                colour_map_edge[(self.__controller.selected_edge()[0], self.__controller.selected_edge()[1])] = 'red'
                 graphe_sel.remove_edges_from(graphe.edges)
-                print(labels)
-                nx.draw_networkx_edges(graphe_sel, self._pos, graphe_sel.edges, edge_color='red')
-                nx.draw_networkx_edge_labels(self.__controller.graphe(), self._pos, labels)
-                nx.draw_networkx_nodes(graphe_sel, self._pos, node_color='skyblue', node_size=800)
-            else:
-                # Dessiner le graphe dans l'axe du canvas
-                nx.draw(self.__controller.graphe(), self._pos, with_labels=True, node_color='skyblue', node_size=800)
-                labels = nx.get_edge_attributes(self.__controller.graphe(), "weight")
-                nx.draw_networkx_edge_labels(self.__controller.graphe(), self._pos, edge_labels=labels)
+                edges_sel = graphe_sel.edges
+
+            node_colours = [colour_map[node] for node in self.__controller.graphe()]
+
+            edge_colours = [colour_map_edge[edge] for edge in self.__controller.graphe().edges]
+
+            nx.draw(self.__controller.graphe(), self._pos, with_labels=True, node_color=node_colours, node_size=800)
+
+            nx.draw_networkx_edges(self.__controller.graphe(), self._pos, self.__controller.graphe().edges, edge_color=edge_colours)
+
+            labels = nx.get_edge_attributes(self.__controller.graphe(), "weight")
+            nx.draw_networkx_edge_labels(self.__controller.graphe(), self._pos, edge_labels=labels)
 
         except NetworkXError as nxe:
             print("__draw_graphe, Erreur inatendue:", nxe)
