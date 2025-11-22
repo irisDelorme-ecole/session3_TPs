@@ -48,6 +48,9 @@ class MainController :
     def chemin(self):
         return self.__model.chemin
 
+    def node_colours(self):
+        return self.__model.node_colours
+
     def create_edge(self,pos1, pos2):
         self.__model.create_edge(pos1, pos2)
 

@@ -65,42 +65,42 @@ class GraphCanvas(FigureCanvasQTAgg):
         colour_map = {name: 'skyblue' for name, _ in self._pos.items()}
         colour_map_edge = {name: 'black' for name in self.__controller.graphe().edges}
         try:
-            if self.__controller.chemin():
-                selection_colour = 'orange'
-                graphe.remove_nodes_from(self.__controller.chemin())
+            # if self.__controller.chemin():
+            #     selection_colour = 'orange'
+            #     graphe.remove_nodes_from(self.__controller.chemin())
+            #
+            #     has_edge_selection = True
+            #
+            #     graphe_sel.remove_nodes_from(graphe)
+            #     graphe.remove_edges_from(graphe_sel.edges)
+            #
+            #     for edge in graphe_sel.edges:
+            #         colour_map_edge[edge] = selection_colour
+            #
+            #     for node in graphe_sel.nodes:
+            #         colour_map[node] = selection_colour
+            #
+            #
+            # elif self.__controller.selected_node():
+            #     graphe.remove_node(int(self.__controller.selected_node()[0]))
+            #
+            #     colour_map[self.__controller.selected_node()[0]] = selection_colour
+            #
+            #     pos_sel_node = {int(self.__controller.selected_node()[0]): self.__controller.selected_node()[1]}
+            #
+            #     graphe_sel.remove_nodes_from(graphe)
+            #
+            #
+            # elif self.__controller.selected_edge():
+            #     has_edge_selection = True
+            #     graphe.remove_edge(self.__controller.selected_edge()[0], self.__controller.selected_edge()[1])
+            #     colour_map_edge[(self.__controller.selected_edge()[0], self.__controller.selected_edge()[1])] = 'red'
+            #     graphe_sel.remove_edges_from(graphe.edges)
+            #     edges_sel = graphe_sel.edges
 
-                has_edge_selection = True
+            node_colours = [self.__controller.node_colours()[node] for node in self.__controller.graphe()]
 
-                graphe_sel.remove_nodes_from(graphe)
-                graphe.remove_edges_from(graphe_sel.edges)
-
-                for edge in graphe_sel.edges:
-                    colour_map_edge[edge] = selection_colour
-
-                for node in graphe_sel.nodes:
-                    colour_map[node] = selection_colour
-
-
-            elif self.__controller.selected_node():
-                graphe.remove_node(int(self.__controller.selected_node()[0]))
-
-                colour_map[self.__controller.selected_node()[0]] = selection_colour
-
-                pos_sel_node = {int(self.__controller.selected_node()[0]): self.__controller.selected_node()[1]}
-
-                graphe_sel.remove_nodes_from(graphe)
-
-
-            elif self.__controller.selected_edge():
-                has_edge_selection = True
-                graphe.remove_edge(self.__controller.selected_edge()[0], self.__controller.selected_edge()[1])
-                colour_map_edge[(self.__controller.selected_edge()[0], self.__controller.selected_edge()[1])] = 'red'
-                graphe_sel.remove_edges_from(graphe.edges)
-                edges_sel = graphe_sel.edges
-
-            node_colours = [colour_map[node] for node in self.__controller.graphe()]
-
-            edge_colours = [colour_map_edge[edge] for edge in self.__controller.graphe().edges]
+            edge_colours = [nx.get_edge_attributes(self.__controller.graphe(), "couleur")[edge] for edge in self.__controller.graphe().edges]
 
             nx.draw(self.__controller.graphe(), self._pos, with_labels=True, node_color=node_colours, node_size=800)
 

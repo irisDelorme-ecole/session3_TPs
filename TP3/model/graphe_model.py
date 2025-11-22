@@ -4,11 +4,14 @@ import threading
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
-from PyQt6.QtCore import pyqtSignal, QObject, QThread
+from PyQt6.QtCore import pyqtSignal, QObject, QThread, Qt
+from PyQt6.QtWidgets import QInputDialog, QProgressBar, QDialog, QVBoxLayout, QWidget, QLabel
 from networkx import Graph
+import time
 
 class PlusCourtChemin(QThread):
     chemin = pyqtSignal(list)
+    progress_pourcent = pyqtSignal(int, int)
 
     def __init__(self, debut, fin, graphe:nx.Graph):
         super().__init__()
@@ -18,8 +21,30 @@ class PlusCourtChemin(QThread):
         self._graphe = graphe
 
     def run(self):
-        self.chemin.emit(nx.shortest_path(self._graphe, self._debut, self._fin))
+        chemin = []
+        progress = 0
+        chemin_temp = nx.shortest_path(self._graphe, self._debut, self._fin)
 
+        while progress < len(chemin_temp):
+            chemin.append(chemin_temp[progress])
+            progress += 1
+
+            time.sleep(1)
+            self.chemin.emit(chemin)
+            self.progress_pourcent.emit(len(chemin), len(chemin_temp))
+
+class PopupWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("")
+        self.setGeometry(100, 600, 250, 75)
+
+        layout = QVBoxLayout()
+        label = QLabel("Recherche du chemin...")
+        self.progress = QProgressBar()
+        layout.addWidget(label)
+        layout.addWidget(self.progress)
+        self.setLayout(layout)
 
 class GrapheModel(QObject):
     # Le graphe 0 à afficher
@@ -57,16 +82,36 @@ class GrapheModel(QObject):
 
         self.thread.start()
 
+        self.progressBar = PopupWindow()
+
+
         self.thread.chemin.connect(self.set_chemin)
+        self.thread.progress_pourcent.connect(self.gestion_progress)
+
+    def gestion_progress(self, progress, total):
+        self.progressBar.show()
+
+        self.progressBar.progress.setValue(int((progress/total)*100))
+        if progress == total:
+            time.sleep(0.5)
+            self.progressBar.hide()
+            self.progressBar.progress.setValue(0)
+
 
     @property
     def chemin(self):
         return self.__chemin
 
     def set_chemin(self, chemin):
+        self.remove_selecteds()
+
         self.__chemin = chemin
-        self.__selected_node = []
-        self.__selected_edge = []
+
+        for i in range(len(self.__chemin)):
+            self.__node_colours[self.__chemin[i]] = 'orange'
+            if i < len(self.__chemin)-1:
+                self._graphe.edges[(self.__chemin[i],self.__chemin[i+1])]['couleur'] = 'orange'
+
         self.grapheChanged.emit(self._pos)
 
     def set_debut(self, debut):
@@ -77,22 +122,32 @@ class GrapheModel(QObject):
 
     def create_edge(self, pos1, pos2):
         # TODO : fix avec nouvelle structure
+        self.remove_selecteds()
         node1 = self.get_node_at(pos1)
         node2 = self.get_node_at(pos2)
+
+        value, is_valid_weight = QInputDialog.getInt(None, "Selection du poids", "Entrez un entier:", value=1, min=1, max=100, step=1)  # Step size
+
         if self._graphe.has_node(node1[0]) and self._graphe.has_node(node2[0]):
-            if self._graphe.has_edge(node1[0], node2[0]):
-                self._graphe[node1[0]][node2[0]]['weight'] += 1
-                self.__selected_edge = [node1[0], node2[0]]
-            else:
-                self._graphe.add_edge(node1[0], node2[0], weight=1)
+
+            if not self._graphe.has_edge(node1[0], node2[0]):
+                self._graphe.add_edge(node1[0], node2[0])
+
             self.__selected_edge = [node1[0], node2[0]]
-            self.__selected_node = []
+            self._graphe.edges[self.__selected_edge]['couleur'] = 'red'
+            if is_valid_weight:
+                self._graphe.edges[self.__selected_edge]['weight'] = value
+            else:
+                self._graphe.edges[self.__selected_edge]['weight'] = 1
+
             self.grapheChanged.emit(self._pos)
 
     def move_node(self, node, pos):
+        self.remove_selecteds()
         self._pos[node] = pos
         self.__selected_node = [node, pos]
-        self.__selected_edge = []
+        self.__node_colours[node] = 'red'
+
         self.grapheChanged.emit(self._pos)
 
     def graphe_order(self):
@@ -126,11 +181,22 @@ class GrapheModel(QObject):
         for u, v in self._graphe.edges():
             self._graphe[u][v]['weight'] = random.randint(self.__poids_min, self.__poids_max)
 
+        for u, v in self._graphe.edges():
+            self._graphe[u][v]['couleur'] = 'black'
+
         # stocke le nouveau layout
         self._pos = nx.spring_layout(self._graphe, seed=42)
 
+        self.__node_colours = {}
+        for node in self._graphe.nodes:
+            self.__node_colours[node] = 'skyblue'
+
         # Notif des vues
         self.grapheChanged.emit(self._pos)
+
+    @property
+    def node_colours(self):
+        return self.__node_colours
 
     def get_number_nodes(self):
         return len(self._pos)
@@ -141,10 +207,27 @@ class GrapheModel(QObject):
 
     @selected_edge.setter
     def selected_edge(self, value):
-        self.__selected_edge = [value[0], value[1]]
-        self.__selected_node = []
-        self.__chemin = []
+        self.remove_selecteds()
+
+        self.__selected_edge = value
+        self._graphe.edges[value]['couleur'] = 'red'
+
         self.grapheChanged.emit(self._pos)
+
+    def remove_selecteds(self):
+        if self.__selected_edge:
+            self._graphe.edges[self.__selected_edge]['couleur'] = 'black'
+            self.__selected_edge = []
+        if self.__selected_node:
+            self.__node_colours[self.__selected_node[0]] = 'skyblue'
+            self.__selected_node = []
+
+        if self.__chemin:
+            for i in range(len(self.__chemin)):
+                self.__node_colours[self.__chemin[i]] = 'skyblue'
+                if i < len(self.__chemin)-1:
+                    self._graphe.edges[(self.__chemin[i],self.__chemin[i+1])]['couleur'] = 'black'
+            self.__chemin = []
 
     @property
     def selected_node(self):
@@ -152,27 +235,29 @@ class GrapheModel(QObject):
 
     @selected_node.setter
     def selected_node(self, value):
+        self.remove_selecteds()
         self.__selected_node = value
 
         if not self._graphe.has_node(int(value[0])):
             self._graphe.add_node(int(value[0]), pos=value[1])
             self._pos[int(value[0])] = value[1]
 
-        self.__selected_edge = []
-        self.__chemin = []
+        self.__node_colours[value[0]] = 'red'
+
         self.grapheChanged.emit(self._pos)
 
     def delete_node(self):
-        print(self.__selected_node)
         self._graphe.remove_node(self.__selected_node[0])
         del self._pos[self.__selected_node[0]]
-        self.__selected_node = []
+
+        self.remove_selecteds()
+
         self.grapheChanged.emit(self._pos)
 
     def delete_edge(self):
-
         self._graphe.remove_edge(self.__selected_edge[0], self.__selected_edge[1])
         self.__selected_edge = []
+        self.remove_selecteds()
         self.grapheChanged.emit(self._pos)
 
     def dist_edge(self, edge, position):
@@ -217,13 +302,12 @@ class GrapheModel(QObject):
         return None
 
     def delete_graph(self):
+        self.remove_selecteds()
         # Effacer les references au graphe
         self._graphe = nx.empty_graph()
         # stocke le nouveau layout
         self._pos = nx.spring_layout(self._graphe, seed=42)
 
-        self.__selected_node = []
-        self.__selected_edge = []
 
         # Notif des vues
         self.grapheChanged.emit(self._pos)
