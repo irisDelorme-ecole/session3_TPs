@@ -11,7 +11,7 @@ import time
 
 class PlusCourtChemin(QThread):
     chemin = pyqtSignal(list)
-    progress_pourcent = pyqtSignal(int, int)
+    progress_chemin = pyqtSignal(int, int)
 
     def __init__(self, debut, fin, graphe:nx.Graph):
         super().__init__()
@@ -31,7 +31,26 @@ class PlusCourtChemin(QThread):
 
             time.sleep(1)
             self.chemin.emit(chemin)
-            self.progress_pourcent.emit(len(chemin), len(chemin_temp))
+            self.progress_chemin.emit(len(chemin), len(chemin_temp))
+
+class Parcourir(QThread):
+    progress_parcours = pyqtSignal(int, int)
+    signal_fini = pyqtSignal(str)
+
+    def __init__(self, graphe:nx.Graph):
+        super().__init__()
+        self._graphe = graphe
+
+    def run(self):
+        progress = 0
+        for node in self._graphe.nodes:
+            progress += 1
+            print('here')
+            time.sleep(1)
+            self.progress_parcours.emit(node, progress)
+        time.sleep(2)
+        self.signal_fini.emit('fin')
+
 
 class PopupWindow(QWidget):
     def __init__(self):
@@ -71,32 +90,64 @@ class GrapheModel(QObject):
 
     __chemin = []
 
+    __parcours = []
+
     # signal qui envoie le graphe complet
     grapheChanged = pyqtSignal(dict)
     def __init__(self):
         super().__init__()
         self._pos = nx.spring_layout(self._graphe, seed=42)
 
-    def lancer_thread(self):
-        self.thread = PlusCourtChemin( self.__debut, self.__fin,self._graphe)
+    def lancer_thread_chemin(self):
+        self.thread_chemin = PlusCourtChemin(self.__debut, self.__fin, self._graphe)
 
-        self.thread.start()
+        self.thread_chemin.start()
 
         self.progressBar = PopupWindow()
 
 
-        self.thread.chemin.connect(self.set_chemin)
-        self.thread.progress_pourcent.connect(self.gestion_progress)
+        self.thread_chemin.chemin.connect(self.set_chemin)
+        self.thread_chemin.progress_chemin.connect(self.gestion_progress_chemin)
 
-    def gestion_progress(self, progress, total):
+    def lancer_thread_parcours(self):
+        self.thread_parcours = Parcourir( self._graphe)
+
+        self.thread_parcours.start()
+
+
+        self.progressBar = PopupWindow()
+
+        self.thread_parcours.progress_parcours.connect(self.set_parcourir)
+        self.thread_parcours.signal_fini.connect(self.finir_parcours)
+
+    def set_parcourir(self, node, progress):
+        self.progressBar.show()
+        self.progressBar.progress.setValue(int((progress/self._graphe.number_of_nodes())*100))
+
+        self.__parcours.append(node)
+
+        self.__node_colours[node] = 'red'
+
+        self.grapheChanged.emit(self._pos)
+
+
+    def finir_parcours(self):
+        self.remove_selecteds()
+        self.progressBar.hide()
+        self.grapheChanged.emit(self._pos)
+
+
+    def gestion_progress_chemin(self, progress, total):
         self.progressBar.show()
 
-        self.progressBar.progress.setValue(int((progress/total)*100))
+        self.progressBar.progress.setRange(0,0)
         if progress == total:
             time.sleep(0.5)
             self.progressBar.hide()
-            self.progressBar.progress.setValue(0)
 
+    def set_nbr_nodes(self, value):
+        if 0 < value < 101:
+            self.__default_graphe_order = value
 
     @property
     def chemin(self):
@@ -228,6 +279,12 @@ class GrapheModel(QObject):
                 if i < len(self.__chemin)-1:
                     self._graphe.edges[(self.__chemin[i],self.__chemin[i+1])]['couleur'] = 'black'
             self.__chemin = []
+
+        if self.__parcours:
+            for node in self.__parcours:
+                self.__node_colours[node] = 'skyblue'
+            self.__parcours = []
+
 
     @property
     def selected_node(self):

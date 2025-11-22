@@ -56,48 +56,10 @@ class GraphCanvas(FigureCanvasQTAgg):
     def __draw_graphe(self):
         if self.__controller.graphe() is None:
             return
-        has_edge_selection = False
-        selection_colour = 'red'
-        pos_sel_node = {}
-        pos_main_node = self._pos
-        graphe = self.__controller.graphe().copy()
-        graphe_sel = graphe.copy()
-        colour_map = {name: 'skyblue' for name, _ in self._pos.items()}
-        colour_map_edge = {name: 'black' for name in self.__controller.graphe().edges}
-        try:
-            # if self.__controller.chemin():
-            #     selection_colour = 'orange'
-            #     graphe.remove_nodes_from(self.__controller.chemin())
-            #
-            #     has_edge_selection = True
-            #
-            #     graphe_sel.remove_nodes_from(graphe)
-            #     graphe.remove_edges_from(graphe_sel.edges)
-            #
-            #     for edge in graphe_sel.edges:
-            #         colour_map_edge[edge] = selection_colour
-            #
-            #     for node in graphe_sel.nodes:
-            #         colour_map[node] = selection_colour
-            #
-            #
-            # elif self.__controller.selected_node():
-            #     graphe.remove_node(int(self.__controller.selected_node()[0]))
-            #
-            #     colour_map[self.__controller.selected_node()[0]] = selection_colour
-            #
-            #     pos_sel_node = {int(self.__controller.selected_node()[0]): self.__controller.selected_node()[1]}
-            #
-            #     graphe_sel.remove_nodes_from(graphe)
-            #
-            #
-            # elif self.__controller.selected_edge():
-            #     has_edge_selection = True
-            #     graphe.remove_edge(self.__controller.selected_edge()[0], self.__controller.selected_edge()[1])
-            #     colour_map_edge[(self.__controller.selected_edge()[0], self.__controller.selected_edge()[1])] = 'red'
-            #     graphe_sel.remove_edges_from(graphe.edges)
-            #     edges_sel = graphe_sel.edges
 
+        graphe = self.__controller.graphe().copy()
+
+        try:
             node_colours = [self.__controller.node_colours()[node] for node in self.__controller.graphe()]
 
             edge_colours = [nx.get_edge_attributes(self.__controller.graphe(), "couleur")[edge] for edge in self.__controller.graphe().edges]
@@ -144,6 +106,7 @@ class GraphCanvas(FigureCanvasQTAgg):
     def keyPressEvent(self, event):
         if event.key() == Qt.Key.Key_Delete:
             self.signal_delete.emit("del pressed")
+
 
     def on_graph_changed(self, position):
         self._pos = position

@@ -1,3 +1,4 @@
+from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import QPushButton, QMainWindow, QVBoxLayout, QSpinBox, QProgressBar, QComboBox, QLineEdit
 from PyQt6.uic import loadUi
 from typing import TYPE_CHECKING
@@ -20,6 +21,8 @@ class MainWindow(QMainWindow):
     finSpinBox:QSpinBox
     tracerPushButton:QPushButton
 
+    signal_parcourir = pyqtSignal(str)
+
 
 
     def __init__(self):
@@ -32,7 +35,11 @@ class MainWindow(QMainWindow):
             self.__controller: MainController | None = None
 
         self.finSpinBox.setValue(9)
+        self.nbrNodes.setValue(10)
 
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key.Key_P:
+            self.signal_parcourir.emit("parcourir")
 
     def add_canvas(self, canvas):
         #  insérer le canvas dans le layout

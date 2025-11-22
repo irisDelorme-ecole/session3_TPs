@@ -42,9 +42,6 @@
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="sizeConstraint">
-       <enum>QLayout::SetDefaultConstraint</enum>
-      </property>
       <item>
        <layout class="QGridLayout" name="gridLayout">
         <item row="1" column="0">
@@ -97,18 +94,32 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="createButton">
-        <property name="text">
-         <string>Generer</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="deleteButton">
-        <property name="text">
-         <string>Effacer</string>
-        </property>
-       </widget>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="QPushButton" name="createButton">
+          <property name="text">
+           <string>Generer</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QPushButton" name="deleteButton">
+          <property name="text">
+           <string>Effacer</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Nombre de noeuds : </string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QSpinBox" name="nbrNodes"/>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>
@@ -120,7 +131,7 @@
      <x>0</x>
      <y>0</y>
      <width>1031</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>
