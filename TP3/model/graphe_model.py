@@ -1,11 +1,12 @@
 import random
 import threading
+from logging import CRITICAL
 
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 from PyQt6.QtCore import pyqtSignal, QObject, QThread, Qt
-from PyQt6.QtWidgets import QInputDialog, QProgressBar, QDialog, QVBoxLayout, QWidget, QLabel
+from PyQt6.QtWidgets import QInputDialog, QProgressBar, QDialog, QVBoxLayout, QWidget, QLabel, QMessageBox
 from networkx import Graph
 import time
 
@@ -23,15 +24,19 @@ class PlusCourtChemin(QThread):
     def run(self):
         chemin = []
         progress = 0
-        chemin_temp = nx.shortest_path(self._graphe, self._debut, self._fin)
+        try:
+            chemin_temp = nx.shortest_path(self._graphe, self._debut, self._fin)
 
-        while progress < len(chemin_temp):
-            chemin.append(chemin_temp[progress])
-            progress += 1
+            while progress < len(chemin_temp):
+                chemin.append(chemin_temp[progress])
+                progress += 1
 
-            time.sleep(1)
-            self.chemin.emit(chemin)
-            self.progress_chemin.emit(len(chemin), len(chemin_temp))
+                time.sleep(1)
+                self.chemin.emit(chemin)
+                self.progress_chemin.emit(len(chemin), len(chemin_temp))
+        except Exception as e:
+            self.chemin.emit([])
+
 
 class Parcourir(QThread):
     progress_parcours = pyqtSignal(int, int)
@@ -45,7 +50,6 @@ class Parcourir(QThread):
         progress = 0
         for node in self._graphe.nodes:
             progress += 1
-            print('here')
             time.sleep(1)
             self.progress_parcours.emit(node, progress)
         time.sleep(2)
@@ -53,13 +57,13 @@ class Parcourir(QThread):
 
 
 class PopupWindow(QWidget):
-    def __init__(self):
+    def __init__(self, text):
         super().__init__()
         self.setWindowTitle("")
         self.setGeometry(100, 600, 250, 75)
 
         layout = QVBoxLayout()
-        label = QLabel("Recherche du chemin...")
+        label = QLabel(text)
         self.progress = QProgressBar()
         layout.addWidget(label)
         layout.addWidget(self.progress)
@@ -98,31 +102,24 @@ class GrapheModel(QObject):
         super().__init__()
         self._pos = nx.spring_layout(self._graphe, seed=42)
 
-    def lancer_thread_chemin(self):
-        self.thread_chemin = PlusCourtChemin(self.__debut, self.__fin, self._graphe)
 
-        self.thread_chemin.start()
+    @property
+    def debut(self):
+        return self.__debut
 
-        self.progressBar = PopupWindow()
+    @debut.setter
+    def debut(self, value):
+        self.__debut = value
 
+    @property
+    def fin(self):
+        return self.__fin
 
-        self.thread_chemin.chemin.connect(self.set_chemin)
-        self.thread_chemin.progress_chemin.connect(self.gestion_progress_chemin)
+    @fin.setter
+    def fin(self, value):
+        self.__fin = value
 
-    def lancer_thread_parcours(self):
-        self.thread_parcours = Parcourir( self._graphe)
-
-        self.thread_parcours.start()
-
-
-        self.progressBar = PopupWindow()
-
-        self.thread_parcours.progress_parcours.connect(self.set_parcourir)
-        self.thread_parcours.signal_fini.connect(self.finir_parcours)
-
-    def set_parcourir(self, node, progress):
-        self.progressBar.show()
-        self.progressBar.progress.setValue(int((progress/self._graphe.number_of_nodes())*100))
+    def set_parcourir(self, node):
 
         self.__parcours.append(node)
 
@@ -131,19 +128,6 @@ class GrapheModel(QObject):
         self.grapheChanged.emit(self._pos)
 
 
-    def finir_parcours(self):
-        self.remove_selecteds()
-        self.progressBar.hide()
-        self.grapheChanged.emit(self._pos)
-
-
-    def gestion_progress_chemin(self, progress, total):
-        self.progressBar.show()
-
-        self.progressBar.progress.setRange(0,0)
-        if progress == total:
-            time.sleep(0.5)
-            self.progressBar.hide()
 
     def set_nbr_nodes(self, value):
         if 0 < value < 101:
@@ -154,22 +138,23 @@ class GrapheModel(QObject):
         return self.__chemin
 
     def set_chemin(self, chemin):
-        self.remove_selecteds()
 
-        self.__chemin = chemin
+        if chemin:
+            self.remove_selecteds()
 
-        for i in range(len(self.__chemin)):
-            self.__node_colours[self.__chemin[i]] = 'orange'
-            if i < len(self.__chemin)-1:
-                self._graphe.edges[(self.__chemin[i],self.__chemin[i+1])]['couleur'] = 'orange'
+            self.__chemin = chemin
 
-        self.grapheChanged.emit(self._pos)
+            for i in range(len(self.__chemin)):
+                self.__node_colours[self.__chemin[i]] = 'orange'
+                if i < len(self.__chemin)-1:
+                    self._graphe.edges[(self.__chemin[i],self.__chemin[i+1])]['couleur'] = 'orange'
 
-    def set_debut(self, debut):
-        self.__debut = debut
+            self.grapheChanged.emit(self._pos)
+        else:
+            error = QMessageBox(None)
+            error.critical(None,"Aucun chemin possible !!!", "")
 
-    def set_fin(self, fin):
-        self.__fin = fin
+
 
     def create_edge(self, pos1, pos2):
         # TODO : fix avec nouvelle structure
@@ -284,6 +269,7 @@ class GrapheModel(QObject):
             for node in self.__parcours:
                 self.__node_colours[node] = 'skyblue'
             self.__parcours = []
+        self.grapheChanged.emit(self._pos)
 
 
     @property
