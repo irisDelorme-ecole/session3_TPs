@@ -1,12 +1,8 @@
 import time
-
-from PyQt6.QtCore import QThread, pyqtSignal
-from PyQt6.QtWidgets import QProgressBar
-
 from model.graphe_model import GrapheModel
 from view.GrapheCanvas import GraphCanvas
 from view.MainWindow import MainWindow
-from model.graphe_model import Parcourir, PopupWindow, PlusCourtChemin
+from model.threads import Parcourir, PopupWindow, PlusCourtChemin
 
 
 class MainController:
