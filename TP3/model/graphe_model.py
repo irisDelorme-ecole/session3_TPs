@@ -1,18 +1,8 @@
 import random
-import threading
-from logging import CRITICAL
-
 import networkx as nx
-import matplotlib.pyplot as plt
-import numpy as np
-from PyQt6.QtCore import pyqtSignal, QObject, QThread, Qt
-from PyQt6.QtWidgets import QInputDialog, QProgressBar, QDialog, QVBoxLayout, QWidget, QLabel, QMessageBox
+from PyQt6.QtCore import pyqtSignal, QObject
+from PyQt6.QtWidgets import QInputDialog, QMessageBox
 from networkx import Graph
-import time
-
-
-
-
 
 class GrapheModel(QObject):
     # Le graphe 0 à afficher
@@ -155,10 +145,11 @@ class GrapheModel(QObject):
 
     def generate_graph(self):
         self.delete_graph()
+
         # Générer un graphe aléatoire non orienté avec une probabilité d'Arete donnée
         self._graphe = nx.gnp_random_graph(self.default_graphe_order, self.__proba, directed=False)
 
-        # Ajouter un poids aléatoire à chaque arête
+        # Ajouter un poids aléatoire à chaque arête et stocke une couleur de base
         for u, v in self._graphe.edges():
             self._graphe[u][v]['weight'] = random.randint(self.__poids_min, self.__poids_max)
 
@@ -168,6 +159,7 @@ class GrapheModel(QObject):
         # stocke le nouveau layout
         self._pos = nx.spring_layout(self._graphe, seed=42)
 
+        #stockage de couleur des nodes
         self.__node_colours = {}
         for node in self._graphe.nodes:
             self.__node_colours[node] = 'skyblue'
@@ -237,9 +229,7 @@ class GrapheModel(QObject):
     def delete_node(self):
         self._graphe.remove_node(self.__selected_node[0])
         del self._pos[self.__selected_node[0]]
-
         self.remove_selecteds()
-
         self.grapheChanged.emit(self._pos)
 
     def delete_edge(self):
@@ -251,23 +241,40 @@ class GrapheModel(QObject):
     def dist_edge(self, edge, position):
         # TODO: make work
 
-        x_click = position[0]
-        y_click = position[1]
-        x_pt1 = self._pos[edge[0]][0]
-        y_pt1 = self._pos[edge[0]][1]
-        x_pt2 = self._pos[edge[1]][0]
-        y_pt2 = self._pos[edge[1]][1]
+            x_click = position[0]
+            y_click = position[1]
+            x_pt1 = self._pos[edge[0]][0]
+            y_pt1 = self._pos[edge[0]][1]
+            x_pt2 = self._pos[edge[1]][0]
+            y_pt2 = self._pos[edge[1]][1]
 
-        x_pc = x_click - x_pt1
-        y_pc = y_click - y_pt1
+            x_pc = x_click - x_pt1
+            y_pc = y_click - y_pt1
 
-        x_edge = x_pt2 - x_pt1
-        y_edge = y_pt2 - y_pt1
+            x_edge = x_pt2 - x_pt1
+            y_edge = y_pt2 - y_pt1
 
-        x_dist = x_click - (x_pt1 + ((x_pc * x_edge + y_pc * y_edge) / (x_edge ** 2 + y_edge ** 2) * x_edge))
-        y_dist = y_click - (y_pt1 + ((x_pc * x_edge + y_pc * y_edge) / (x_edge ** 2 + y_edge ** 2) * y_edge))
+            print(f'click: {position}, edge pt1 {self._pos[edge[1]]}, edge pt 2 {self._pos[edge[0]]}, pc = ({x_pc}, {y_pc}), edge = ({x_edge}, {y_edge}), produit scal {x_edge*x_pc + y_edge*y_pc}')
 
-        return round((x_dist ** 2) + (y_dist ** 2) ** (1 / 2), 4)
+            if (x_edge*x_pc + y_edge*y_pc) > 0 and ((x_edge**2 + y_edge **2)**(1/2) > (x_pc**2 + y_pc**2)**(1/2)):
+
+                x_dist = x_click - (x_pt1 + ((x_pc * x_edge + y_pc * y_edge) / (x_edge ** 2 + y_edge ** 2) * x_edge))
+                y_dist = y_click - (y_pt1 + ((x_pc * x_edge + y_pc * y_edge) / (x_edge ** 2 + y_edge ** 2) * y_edge))
+
+                return round((x_dist ** 2) + (y_dist ** 2) ** (1 / 2), 4)
+            else:
+                dist_1 = ((x_click-x_pt1)**2 + (y_click - y_pt1)**2)**(1/2)
+                dist_2 = ((x_click-x_pt2)**2 + (y_click - y_pt2)**2)**(1/2)
+            if dist_1 < dist_2:
+                return dist_1
+            else:
+                return dist_2
+
+
+
+
+
+
 
     def get_node_at(self, position):
 
@@ -281,11 +288,16 @@ class GrapheModel(QObject):
                 selected_node.append(pos)
 
                 return selected_node
-        return [self.get_number_nodes(), position]
+
+        max_val = -1
+        for key in self._pos.keys():
+            if int(key) > max_val:
+                max_val =key
+        return [max_val+1, position]
 
     def get_edge_at(self, position):
         for edge in self._graphe.edges:
-            if self.dist_edge(edge, position) <= 0.01:
+            if self.dist_edge(edge, position) <= 0.06:
                 return edge
         return None
 

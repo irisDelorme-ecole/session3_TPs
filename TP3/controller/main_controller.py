@@ -98,6 +98,7 @@ class MainController:
         possible_node = self.__model.get_node_at(pos)
         possible_edge = self.__model.get_edge_at(pos)
 
+
         if self.__model.graphe.has_node(possible_node[0]):
             self.__model.selected_node = possible_node  # priority one: s'il y a une node
         elif possible_edge:
