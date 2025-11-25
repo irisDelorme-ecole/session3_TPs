@@ -53,7 +53,7 @@ class Parcourir(QThread):
 class PopupWindow(QWidget):
     def __init__(self, text):
         super().__init__()
-        self.setWindowTitle("")
+        self.setWindowTitle("Progress")
         self.setGeometry(100, 600, 250, 75)
 
         layout = QVBoxLayout()

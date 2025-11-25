@@ -63,7 +63,6 @@ class GrapheModel(QObject):
         self.grapheChanged.emit(self._pos)
 
 
-
     def set_nbr_nodes(self, value):
         if 0 < value < 101:
             self.__default_graphe_order = value
@@ -254,8 +253,6 @@ class GrapheModel(QObject):
             x_edge = x_pt2 - x_pt1
             y_edge = y_pt2 - y_pt1
 
-            print(f'click: {position}, edge pt1 {self._pos[edge[1]]}, edge pt 2 {self._pos[edge[0]]}, pc = ({x_pc}, {y_pc}), edge = ({x_edge}, {y_edge}), produit scal {x_edge*x_pc + y_edge*y_pc}')
-
             if (x_edge*x_pc + y_edge*y_pc) > 0 and ((x_edge**2 + y_edge **2)**(1/2) > (x_pc**2 + y_pc**2)**(1/2)):
 
                 x_dist = x_click - (x_pt1 + ((x_pc * x_edge + y_pc * y_edge) / (x_edge ** 2 + y_edge ** 2) * x_edge))
@@ -297,7 +294,7 @@ class GrapheModel(QObject):
 
     def get_edge_at(self, position):
         for edge in self._graphe.edges:
-            if self.dist_edge(edge, position) <= 0.06:
+            if self.dist_edge(edge, position) <= 0.04:
                 return edge
         return None
 

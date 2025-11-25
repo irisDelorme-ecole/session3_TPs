@@ -18,19 +18,23 @@ class MainController:
         self.progressBar_chemin = PopupWindow("Recherche du chemin ...")
         self.progressBar_parcour = PopupWindow("Avancement du parcour ...")
 
-        # Connecter le bouton de creation de graphe
+        #signaux du view
         self.__view.createButton.clicked.connect(self.generate_graph)
         self.__view.deleteButton.clicked.connect(self.delete_graph)
         self.__view.debutSpinBox.valueChanged.connect(self.set_debut)
         self.__view.finSpinBox.valueChanged.connect(self.set_fin)
         self.__view.tracerPushButton.clicked.connect(self.lancer_thread_chemin)
         self.__view.nbrNodes.valueChanged.connect(self.__model.set_nbr_nodes)
+        self.__view.signal_parcourir.connect(self.lancer_thread_parcours)
 
+
+        #signaux du canvas
         self.__canvas.signal.connect(self.canvas_clicked)
         self.__canvas.signal_delete.connect(self.delete_node_or_edge)
         self.__canvas.signal_create_edge.connect(self.create_edge)
         self.__canvas.signal_move.connect(self.move_node)
-        self.__view.signal_parcourir.connect(self.lancer_thread_parcours)
+        self.__canvas.signal_parcourir.connect(self.lancer_thread_parcours)
+
 
     def set_debut(self, value):
         self.__model.debut = value

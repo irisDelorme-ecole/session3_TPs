@@ -22,6 +22,7 @@ class GraphCanvas(FigureCanvasQTAgg):
     signal_delete = pyqtSignal(str)
     signal_create_edge = pyqtSignal(np.ndarray, np.ndarray)
     signal_move = pyqtSignal(np.ndarray, np.ndarray)
+    signal_parcourir = pyqtSignal(str)
 
     def __init__(self):
         # Crée une figure matplotlib
@@ -106,6 +107,8 @@ class GraphCanvas(FigureCanvasQTAgg):
     def keyPressEvent(self, event):
         if event.key() == Qt.Key.Key_Delete:
             self.signal_delete.emit("del pressed")
+        elif event.key() == Qt.Key.Key_P:
+            self.signal_parcourir.emit("parcourir")
 
 
     def on_graph_changed(self, position):
