@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QProgressBar
 
 class PlusCourtChemin(QThread):
     chemin = pyqtSignal(list)
-    progress_chemin = pyqtSignal(int, int)
+    fini_chemin = pyqtSignal(str)
 
     def __init__(self, debut, fin, graphe:nx.Graph):
         super().__init__()
@@ -27,7 +27,9 @@ class PlusCourtChemin(QThread):
 
                 time.sleep(1)
                 self.chemin.emit(chemin)
-                self.progress_chemin.emit(len(chemin), len(chemin_temp))
+            time.sleep(1)
+            self.fini_chemin.emit("")
+
         except Exception as e:
             self.chemin.emit([])
 

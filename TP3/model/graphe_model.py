@@ -91,12 +91,10 @@ class GrapheModel(QObject):
 
 
     def create_edge(self, pos1, pos2):
-        # TODO : fix avec nouvelle structure
         self.remove_selecteds()
         node1 = self.get_node_at(pos1)
         node2 = self.get_node_at(pos2)
 
-        value, is_valid_weight = QInputDialog.getInt(None, "Selection du poids", "Entrez un entier:", value=1, min=1, max=100, step=1)  # Step size
 
         if self._graphe.has_node(node1[0]) and self._graphe.has_node(node2[0]):
 
@@ -105,12 +103,20 @@ class GrapheModel(QObject):
 
             self.__selected_edge = [node1[0], node2[0]]
             self._graphe.edges[self.__selected_edge]['couleur'] = 'red'
-            if is_valid_weight:
-                self._graphe.edges[self.__selected_edge]['weight'] = value
-            else:
-                self._graphe.edges[self.__selected_edge]['weight'] = 1
 
-            self.grapheChanged.emit(self._pos)
+            self.change_edge_weight(self.__selected_edge)
+
+
+    def change_edge_weight(self, edge):
+        value, is_valid_weight = QInputDialog.getInt(None, "Selection du poids", "Entrez un entier:", value=1, min=1,
+                                                     max=100, step=1)
+        if is_valid_weight:
+            self._graphe.edges[edge]['weight'] = value
+        else:
+            self._graphe.edges[edge]['weight'] = 1
+
+        self.grapheChanged.emit(self._pos)
+
 
     def move_node(self, node, pos):
         self.remove_selecteds()

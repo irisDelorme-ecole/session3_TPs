@@ -34,6 +34,7 @@ class MainController:
         self.__canvas.signal_create_edge.connect(self.create_edge)
         self.__canvas.signal_move.connect(self.move_node)
         self.__canvas.signal_parcourir.connect(self.lancer_thread_parcours)
+        self.__canvas.edge_weight_signal.connect(self.change_edge_weight)
 
 
     def set_debut(self, value):
@@ -41,6 +42,12 @@ class MainController:
 
     def set_fin(self, value):
         self.__model.fin = value
+
+    def change_edge_weight(self, pos):
+        edge = self.__model.get_edge_at(pos)
+        if edge:
+            self.__model.change_edge_weight(edge)
+            self.__model.selected_edge = edge
 
     def lancer_thread_parcours(self):
         self.thread_parcours = Parcourir(self.__model.graphe)
@@ -65,16 +72,17 @@ class MainController:
 
         self.thread_chemin.start()
 
-        self.thread_chemin.chemin.connect(self.__model.set_chemin)
-        self.thread_chemin.progress_chemin.connect(self.gestion_progress_chemin)
-
-    def gestion_progress_chemin(self, progress, total):
         self.progressBar_chemin.show()
+        self.progressBar_chemin.progress.setRange(0,0)
 
-        self.progressBar_chemin.progress.setRange(0, 0)
-        if progress == total:
-            time.sleep(0.5)
-            self.progressBar_chemin.hide()
+        self.thread_chemin.chemin.connect(self.__model.set_chemin)
+        self.thread_chemin.fini_chemin.connect(self.finir_chemin)
+
+
+    def finir_chemin(self):
+        time.sleep(1)
+        self.progressBar_chemin.hide()
+        self.__model.remove_selecteds()
 
     def move_node(self, pos_start, pos_end):
         possible_node = self.__model.get_node_at(pos_start)

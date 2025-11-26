@@ -23,6 +23,7 @@ class GraphCanvas(FigureCanvasQTAgg):
     signal_create_edge = pyqtSignal(np.ndarray, np.ndarray)
     signal_move = pyqtSignal(np.ndarray, np.ndarray)
     signal_parcourir = pyqtSignal(str)
+    edge_weight_signal = pyqtSignal(np.ndarray)
 
     def __init__(self):
         # Crée une figure matplotlib
@@ -89,16 +90,16 @@ class GraphCanvas(FigureCanvasQTAgg):
                 self.__dragging_right = False
                 self.__drag_start_pos = pos
 
-
-
         except Exception as e:
             print(e)
 
     def mouseReleaseEvent(self, event):
         pos_end = self.__convert_pos(event)
         if self.__dragging_right:
-            pos_end = self.__convert_pos(event)
-            self.signal_create_edge.emit(self.__drag_start_pos, pos_end)
+            if ((self.__drag_start_pos[0]-pos_end[0])**2 + (self.__drag_start_pos[1]-pos_end[1])**2)**(1/2) > 0.06:
+                self.signal_create_edge.emit(self.__drag_start_pos, pos_end)
+            else:
+                self.edge_weight_signal.emit(self.__drag_start_pos)
         elif ((self.__drag_start_pos[0]-pos_end[0])**2 + (self.__drag_start_pos[1]-pos_end[1])**2)**(1/2) > 0.06:
             self.signal_move.emit(self.__drag_start_pos, pos_end)
         else:
